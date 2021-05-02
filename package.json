@@ -1,0 +1,57 @@
+{
+  "name": "dcanod",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Louis Aussedat",
+  "license": "MIT",
+  "main": "bin/index.js",
+  "scripts": {
+    "build": "rimraf bin/* && tsc -p .",
+    "prettier": "prettier --write 'src/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aussedatlo/dcanod"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "keywords": [
+    "cli",
+    "node",
+    "typescript"
+  ],
+  "bugs": {
+    "url": "https://github.com/aussedatlo/dcanod/issues"
+  },
+  "homepage": "https://github.com/aussedatlo/dcanod#readme",
+  "bin": {
+    "dcanod-cli": "bin/index.js"
+  },
+  "dependencies": {
+    "binance-api-node": "^0.10.41",
+    "chalk": "^4.1.0",
+    "commander": "^7.0.0",
+    "console-table-printer": "^2.8.2",
+    "figlet": "^1.5.0",
+    "prompts": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.2.1",
+    "@types/node": "^14.14.21",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.3",
+    "prettier": "^2.2.1",
+    "typescript": "^4.1.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "npm run prettier"
+    ]
+  }
+}

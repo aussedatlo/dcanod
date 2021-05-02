@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "bin",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true
+  }
+}
