@@ -71,6 +71,7 @@ const main = async () => {
     .description('output some stats from previous orders')
     .option('-d, --debug', 'output extra debugging information')
     .option('-p, --config-path <path>', 'path to the config folder')
+    .option('--html', 'print result in html format')
     .action((options: IOptions) => {
       stats_cmd(options);
     });

@@ -8,6 +8,7 @@ import {
 } from '../utils/config';
 
 const { printTable } = require('console-table-printer');
+const tableify = require('html-tableify');
 
 interface Stat {
   price: number;
@@ -22,7 +23,7 @@ const addDeltaSign = (value: number, comp: number) => {
 };
 
 export const stats = async (options: any) => {
-  const { debug, configPath } = options;
+  const { debug, configPath, html } = options;
   const path = getConfigPath(configPath);
   const config: IConfig = readConfig(path);
   const { platform, key, secret } = config;
@@ -73,12 +74,16 @@ export const stats = async (options: any) => {
           actualPrice - totalSpent > 0
             ? chalk.green(actualPrice)
             : chalk.red(actualPrice),
-        delta: addDeltaSign(delta, 0) + ' %',
+        delta: addDeltaSign(delta, 0) + '%',
         gain: addDeltaSign(gain, 0),
       });
     }
 
-    printTable(table);
+    if (html) {
+      console.log(tableify(table));
+    } else {
+      printTable(table);
+    }
   }
 };
 
