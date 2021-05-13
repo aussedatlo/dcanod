@@ -6,7 +6,9 @@ import {
   readOrders,
   saveOrders,
 } from '../utils/config';
-import { logErr, logOk } from '../utils/utils';
+import { logDebug, logErr, logOk } from '../utils/utils';
+
+const { context } = require('../utils/context');
 
 export interface Params {
   readonly pair: string;
@@ -19,8 +21,9 @@ const buy = async ({ pair, ammount, options }: Params) => {
   const path = getConfigPath(configPath);
   const config: IConfig = readConfig(path);
   const { platform, key, secret } = config;
+  context.debug = debug;
 
-  if (debug) console.log('using path ' + path);
+  logDebug('using path ' + path);
 
   let api: Api | undefined = getApi(platform, key, secret);
 

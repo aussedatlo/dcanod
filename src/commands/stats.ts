@@ -6,9 +6,11 @@ import {
   readConfig,
   readOrders,
 } from '../utils/config';
+import { logDebug } from '../utils/utils';
 
 const { printTable } = require('console-table-printer');
 const tableify = require('html-tableify');
+const { context } = require('../utils/context');
 
 interface Stat {
   price: number;
@@ -28,8 +30,9 @@ export const stats = async (options: any) => {
   const config: IConfig = readConfig(path);
   const { platform, key, secret } = config;
   const orders: IOrders = readOrders(path);
+  context.debug = debug;
 
-  if (debug) console.log('using path ' + path);
+  logDebug('using path ' + path);
 
   let api: Api | undefined = getApi(platform, key, secret);
   let arr: { [key: string]: Stat } = {};

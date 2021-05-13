@@ -1,4 +1,5 @@
 import ApiBinance from 'binance-api-node';
+import { logDebug } from '../utils/utils';
 import Api, { BuyParams, IOrder } from './api';
 
 export class Binance implements Api {
@@ -18,12 +19,17 @@ export class Binance implements Api {
 
     const quantity: string = (ammount / price).toFixed(5);
 
+    logDebug('ammount: ' + ammount);
+    logDebug('quantity: ' + quantity);
+
     const res = await this.client.order({
       symbol: pair,
       side: 'BUY',
       quantity: quantity,
       price: price,
     });
+
+    logDebug(res);
 
     const order: IOrder = {
       pair: pair,

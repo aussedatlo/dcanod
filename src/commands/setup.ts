@@ -1,15 +1,17 @@
 import { IPlatform } from '../api/api';
 import { createConfigFolder, getConfigPath, saveConfig } from '../utils/config';
 import { KEY_LENGTH } from '../utils/constant';
-import { logErr, logOk } from '../utils/utils';
+import { logDebug, logErr, logOk } from '../utils/utils';
 
 const prompts = require('prompts');
+const { context } = require('../utils/context');
 
 const setup_cmd = async (options: any) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
+  context.debug = debug;
 
-  if (debug) console.log('using path ' + path);
+  logDebug('using path ' + path);
 
   const response = await prompts([
     {
