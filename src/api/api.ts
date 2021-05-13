@@ -1,4 +1,3 @@
-import { logErr } from '../utils/utils';
 import { Binance } from './binance';
 
 export interface BuyParams {

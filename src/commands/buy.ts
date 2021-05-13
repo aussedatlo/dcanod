@@ -1,5 +1,4 @@
-import Api, { getApi, IOrder, IPlatform } from '../api/api';
-import { Binance } from '../api/binance';
+import Api, { getApi, IOrder } from '../api/api';
 import {
   getConfigPath,
   IConfig,
