@@ -1,5 +1,6 @@
 import chalk from 'chalk';
-import Api, { getApi, IOrder, IOrders } from '../api/api';
+import { getApi } from '../api/utils';
+import Api, { IOrder, IOrders } from '../api/api';
 import {
   getConfigPath,
   IConfig,

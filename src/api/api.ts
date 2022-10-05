@@ -1,5 +1,3 @@
-import { Binance } from './binance';
-
 export interface BuyParams {
   pair: string;
   ammount: number;
@@ -30,19 +28,3 @@ export default abstract class Api {
     this.secret = secret;
   }
 }
-
-export const getApi = (
-  id: SupportedPlatform,
-  key: string,
-  secret: string
-): Api | undefined => {
-  switch (id) {
-    case 'binance': {
-      return new Binance(key, secret);
-    }
-    case 'kucoin':
-    default: {
-      return undefined;
-    }
-  }
-};

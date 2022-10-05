@@ -1,4 +1,5 @@
-import Api, { getApi, IOrder } from '../api/api';
+import { getApi } from '../api/utils';
+import Api, { IOrder } from '../api/api';
 import {
   getConfigPath,
   IConfig,
