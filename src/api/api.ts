@@ -5,10 +5,7 @@ export interface BuyParams {
   ammount: number;
 }
 
-export enum IPlatform {
-  'binance',
-  'kucoin',
-}
+export type SupportedPlatform = 'binance' | 'kucoin';
 
 export interface IOrder {
   pair: string;
@@ -34,14 +31,16 @@ export default abstract class Api {
   }
 }
 
-export const getApi = (id: IPlatform, key: string, secret: string) => {
-  let api: Api;
+export const getApi = (
+  id: SupportedPlatform,
+  key: string,
+  secret: string
+): Api | undefined => {
   switch (id) {
-    case IPlatform.binance: {
-      api = new Binance(key, secret);
-      return api;
+    case 'binance': {
+      return new Binance(key, secret);
     }
-    case IPlatform.kucoin:
+    case 'kucoin':
     default: {
       return undefined;
     }

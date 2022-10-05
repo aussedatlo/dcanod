@@ -1,4 +1,3 @@
-import { IPlatform } from '../api/api';
 import { createConfigFolder, getConfigPath, saveConfig } from '../utils/config';
 import { KEY_LENGTH } from '../utils/constant';
 import { logDebug, logErr, logOk } from '../utils/utils';
@@ -19,8 +18,8 @@ const setup_cmd = async (options: any) => {
       name: 'platform',
       message: 'Select your platform: ',
       choices: [
-        { title: 'Binance', value: IPlatform.binance },
-        { title: 'Kucoin', value: IPlatform.kucoin },
+        { title: 'Binance', value: 'binance' },
+        { title: 'Kucoin', value: 'kucoin' },
       ],
     },
     {

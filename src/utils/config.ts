@@ -1,9 +1,9 @@
 import path from 'path';
-import { IOrders, IPlatform } from '../api/api';
+import { IOrders, SupportedPlatform } from '../api/api';
 import { CONFIG_FILE, CONFIG_FOLDER, ORDERS_FILE } from './constant';
 
 export interface IConfig {
-  platform: IPlatform;
+  platform: SupportedPlatform;
   key: string;
   secret: string;
 }
