@@ -4,14 +4,11 @@ import Api, { BuyParams, IOrder } from './api';
 
 const FILTER_LOT_SIZE = 'LOT_SIZE';
 
-export class Binance implements Api {
-  key: string;
-  secret: string;
+export class Binance extends Api {
   client: any;
 
   constructor(key: string, secret: string) {
-    this.key = key;
-    this.secret = secret;
+    super(key, secret);
     this.client = ApiBinance({ apiKey: this.key, apiSecret: this.secret });
   }
 

@@ -22,11 +22,16 @@ export interface IOrders {
   orders: IOrder[];
 }
 
-export default interface Api {
-  key: string;
-  secret: string;
-  buy: ({ pair, ammount }: BuyParams) => Promise<IOrder>;
-  price: (pair: string) => Promise<number>;
+export default abstract class Api {
+  protected key: string;
+  protected secret: string;
+  abstract buy: ({ pair, ammount }: BuyParams) => Promise<IOrder>;
+  abstract price: (pair: string) => Promise<number>;
+
+  constructor(key: string, secret: string) {
+    this.key = key;
+    this.secret = secret;
+  }
 }
 
 export const getApi = (id: IPlatform, key: string, secret: string) => {
