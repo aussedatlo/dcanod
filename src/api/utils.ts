@@ -1,5 +1,6 @@
 import Api, { SupportedPlatform } from './api';
 import { Binance } from './binance';
+import { Nexo } from './nexo';
 
 export const getApi = (
   id: SupportedPlatform,
@@ -10,7 +11,9 @@ export const getApi = (
     case 'binance': {
       return new Binance(key, secret);
     }
-    case 'kucoin':
+    case 'nexo': {
+      return new Nexo(key, secret);
+    }
     default: {
       return undefined;
     }

@@ -1,5 +1,5 @@
 import { createConfigFolder, getConfigPath, saveConfig } from '../utils/config';
-import { KEY_LENGTH } from '../utils/constant';
+import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '../utils/constant';
 import { logDebug, logErr, logOk } from '../utils/utils';
 
 const prompts = require('prompts');
@@ -19,7 +19,7 @@ const setup_cmd = async (options: any) => {
       message: 'Select your platform: ',
       choices: [
         { title: 'Binance', value: 'binance' },
-        { title: 'Kucoin', value: 'kucoin' },
+        { title: 'Nexo Pro', value: 'nexo' },
       ],
     },
     {
@@ -27,18 +27,22 @@ const setup_cmd = async (options: any) => {
       name: 'key',
       message: 'Api key: ',
       validate: (value: string) =>
-        value.length != KEY_LENGTH ? `incorrect Api key` : true,
+        KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
+          ? `incorrect Api key`
+          : true,
     },
     {
       type: 'password',
       name: 'secret',
       message: 'Api secret: ',
       validate: (value: string) =>
-        value.length != KEY_LENGTH ? 'incorrect Api key' : true,
+        KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
+          ? 'incorrect Api key'
+          : true,
     },
   ]);
 
-  if (!response.key || !response.secret || response.platform) {
+  if (!response.key || !response.secret || !response.platform) {
     logErr('incorrect setup');
   }
 
