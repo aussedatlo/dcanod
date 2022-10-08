@@ -3,11 +3,11 @@ export interface BuyParams {
   ammount: number;
 }
 
-export type SupportedPlatform = 'binance' | 'kucoin';
+export type SupportedPlatform = 'binance' | 'nexo';
 
 export interface IOrder {
   pair: string;
-  orderId: number;
+  orderId: number | string;
   time: number;
   price: number;
   quantity: number;
