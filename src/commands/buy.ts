@@ -1,12 +1,7 @@
-import { getApi } from '../api/utils';
+import { createOrder, init } from '../utils/sqlite';
 import Api, { IOrder } from '../api/api';
-import {
-  getConfigPath,
-  IConfig,
-  readConfig,
-  readOrders,
-  saveOrders,
-} from '../utils/config';
+import { getApi } from '../api/utils';
+import { getConfigPath, IConfig, readConfig } from '../utils/config';
 import { logDebug, logErr, logOk } from '../utils/utils';
 
 const { context } = require('../utils/context');
@@ -23,6 +18,7 @@ const buy = async ({ pair, ammount, options }: Params) => {
   const config: IConfig = readConfig(path);
   const { platform, key, secret } = config;
   context.debug = debug;
+  await init(path);
 
   logDebug('using path ' + path);
 
@@ -30,8 +26,6 @@ const buy = async ({ pair, ammount, options }: Params) => {
 
   if (api) {
     const order: IOrder = await api.buy({ pair, ammount });
-    const orders = readOrders(path);
-    orders.orders.push(order);
 
     logOk(
       'order created: ' +
@@ -41,7 +35,8 @@ const buy = async ({ pair, ammount, options }: Params) => {
         ', price: ' +
         parseFloat(order.price.toString())
     );
-    saveOrders(orders, path);
+
+    createOrder(path, order);
   } else {
     logErr('no compatible api found');
   }

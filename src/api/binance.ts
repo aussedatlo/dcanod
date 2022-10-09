@@ -21,8 +21,9 @@ export class Binance extends Api {
     // get stepSize from LOT_SIZE filter
     const stepSize: number = exchangeInfo.symbols
       .find((symbol: any) => symbol.symbol === pair)
-      .filters.find((filter: any) => filter.filterType === FILTER_LOT_SIZE)
-      .stepSize;
+      .filters.find(
+        (filter: any) => filter.filterType === FILTER_LOT_SIZE
+      ).stepSize;
     logDebug('step size: ' + stepSize);
 
     // calculate quantity with correct step size
@@ -45,7 +46,7 @@ export class Binance extends Api {
 
     const order: IOrder = {
       pair: pair,
-      orderId: res.orderId,
+      id: res.orderId,
       time: res.transactTime,
       price: parseFloat(res.price),
       quantity: parseFloat(res.origQty),

@@ -1,12 +1,8 @@
 import chalk from 'chalk';
+import { getAllOrders } from '../utils/sqlite';
+import Api, { IOrder } from '../api/api';
 import { getApi } from '../api/utils';
-import Api, { IOrder, IOrders } from '../api/api';
-import {
-  getConfigPath,
-  IConfig,
-  readConfig,
-  readOrders,
-} from '../utils/config';
+import { getConfigPath, IConfig, readConfig } from '../utils/config';
 import { logDebug } from '../utils/utils';
 
 const { printTable } = require('console-table-printer');
@@ -30,7 +26,7 @@ export const stats = async (options: any) => {
   const path = getConfigPath(configPath);
   const config: IConfig = readConfig(path);
   const { platform, key, secret } = config;
-  const orders: IOrders = readOrders(path);
+  const orders: Array<IOrder> = await getAllOrders(path);
   context.debug = debug;
 
   logDebug('using path ' + path);
@@ -39,8 +35,7 @@ export const stats = async (options: any) => {
   let arr: { [key: string]: Stat } = {};
 
   if (api) {
-    let order: IOrder;
-    for (order of orders.orders) {
+    orders.forEach((order) => {
       if (!arr[order.pair])
         arr[order.pair] = { price: 0, quantity: 0, occurence: 0 };
 
@@ -51,9 +46,9 @@ export const stats = async (options: any) => {
         arr[order.pair].quantity.toFixed(5)
       );
       arr[order.pair].occurence += 1;
-    }
+    });
 
-    let table = [];
+    let table: Array<any> = [];
 
     for (let pair in arr) {
       const pairPrice = await api.price(pair);
