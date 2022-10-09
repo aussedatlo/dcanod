@@ -1,5 +1,6 @@
 import { createConfigFolder, getConfigPath, saveConfig } from '../utils/config';
 import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '../utils/constant';
+import { init } from '../utils/sqlite';
 import { logDebug, logErr, logOk } from '../utils/utils';
 
 const prompts = require('prompts');
@@ -50,6 +51,7 @@ const setup_cmd = async (options: any) => {
 
   createConfigFolder(path);
   saveConfig(json_data, path);
+  await init(path);
   logOk('Configuration saved');
 };
 

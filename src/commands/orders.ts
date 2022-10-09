@@ -1,10 +1,11 @@
-import { getConfigPath, readOrders } from '../utils/config';
-import { IOrders } from '../api/api';
+import { getAllOrders } from '../utils/sqlite';
+import { IOrder } from '../api/api';
+import { getConfigPath } from '../utils/config';
 
-export const list = (options: any) => {
+export const list = async (options: any) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
-  const orders: IOrders = readOrders(path);
+  const orders: Array<IOrder> = await getAllOrders(path);
 
   console.log(orders);
 };

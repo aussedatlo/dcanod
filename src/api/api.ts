@@ -7,14 +7,10 @@ export type SupportedPlatform = 'binance' | 'nexo';
 
 export interface IOrder {
   pair: string;
-  orderId: number | string;
+  id: number | string;
   time: number;
   price: number;
   quantity: number;
-}
-
-export interface IOrders {
-  orders: IOrder[];
 }
 
 export default abstract class Api {

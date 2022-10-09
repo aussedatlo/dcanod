@@ -1,6 +1,6 @@
 import path from 'path';
-import { IOrders, SupportedPlatform } from '../api/api';
-import { CONFIG_FILE, CONFIG_FOLDER, ORDERS_FILE } from './constant';
+import { SupportedPlatform } from '../api/api';
+import { CONFIG_FILE, CONFIG_FOLDER } from './constant';
 
 export interface IConfig {
   platform: SupportedPlatform;
@@ -33,25 +33,4 @@ export const saveConfig = (data: string, folder_path: string) => {
       return console.error(err);
     }
   });
-};
-
-export const readOrders = (folder_path: string) => {
-  if (!fs.existsSync(path.join(folder_path, ORDERS_FILE))) {
-    return { orders: [] };
-  }
-
-  const file = fs.readFileSync(path.join(folder_path, ORDERS_FILE), 'utf-8');
-  return JSON.parse(file);
-};
-
-export const saveOrders = (data: IOrders, folder_path: string) => {
-  fs.writeFileSync(
-    path.join(folder_path, ORDERS_FILE),
-    JSON.stringify(data),
-    (err: any) => {
-      if (err) {
-        return console.error(err);
-      }
-    }
-  );
 };

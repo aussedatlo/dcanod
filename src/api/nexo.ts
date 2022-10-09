@@ -27,18 +27,18 @@ export class Nexo extends Api {
 
     logDebug(`amount to buy: ${amountOut}`);
 
-    const orderId = await this.client.placeOrder({
+    const id = await this.client.placeOrder({
       pair: pair,
       side: 'buy',
       type: 'market',
       quantity: amountOut,
     });
 
-    logDebug(orderId);
+    logDebug(id);
 
     const order: IOrder = {
       pair: pair,
-      orderId: orderId.orderId,
+      id: id.orderId,
       time: Date.now(),
       price: quoteResponse.price,
       quantity: amountOut,

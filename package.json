@@ -7,6 +7,7 @@
   "main": "bin/index.js",
   "scripts": {
     "build": "rimraf bin/* && tsc -p .",
+    "build:watch": "rimraf bin/* && tsc --watch -p .",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "repository": {
@@ -37,6 +38,7 @@
     "html-tableify": "^0.0.2",
     "nexo-pro": "^0.1.1",
     "prompts": "^2.4.1",
+    "sqlite3": "^5.1.2",
     "typescript": "^4.8.4"
   },
   "devDependencies": {
