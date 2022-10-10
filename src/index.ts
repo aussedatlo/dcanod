@@ -9,6 +9,7 @@ import setup_cmd from './commands/setup';
 import buy_cmd from './commands/buy';
 import orders_cmd from './commands/orders';
 import stats_cmd from './commands/stats';
+import report_cmd from './commands/report';
 import { logErr } from './utils/utils';
 
 interface IOptions {
@@ -74,6 +75,16 @@ const main = async () => {
     .option('--html', 'print result in html format')
     .action((options: IOptions) => {
       stats_cmd(options);
+    });
+
+  program
+    .command('report')
+    .arguments('<pair>')
+    .description('display report for <pair> pair')
+    .option('-d, --debug', 'output extra debugging information')
+    .option('-p, --config-path <path>', 'path to the config folder')
+    .action((pair: string, options: IOptions) => {
+      report_cmd(pair, options);
     });
 
   program.on('command:*', (commands?: string[]) => {

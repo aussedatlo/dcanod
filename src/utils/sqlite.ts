@@ -118,3 +118,16 @@ export const getAllOrders = async (path: string): Promise<Array<IOrder>> => {
   const db = db_connect(path);
   return (await db_all(db, SQL_SELECT_ALL_ORDERS)) as Array<IOrder>;
 };
+
+const SQL_SELECT_ALL_PAIR_ORDERS = `SELECT * from orders WHERE pair = "%s"`;
+
+export const getAllPairOrders = async (
+  path: string,
+  pair: string
+): Promise<Array<IOrder>> => {
+  const db = db_connect(path);
+  return (await db_all(
+    db,
+    format(SQL_SELECT_ALL_PAIR_ORDERS, pair)
+  )) as Array<IOrder>;
+};
