@@ -5,11 +5,22 @@
   "author": "Louis Aussedat",
   "license": "MIT",
   "main": "lib/index.js",
+  "watch": {
+    "copy-files": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "ts,ejs",
+      "legacyWatch": true
+    }
+  },
   "scripts": {
     "build": "rimraf lib/* && tsc -p . && npm run copy-files",
-    "build:watch": "rimraf lib/* && tsc --watch -p . && npm run copy-files",
     "prettier": "prettier --write 'src/**/*.ts'",
-    "copy-files": "copyfiles -u 1 src/**/*.ejs lib/"
+    "copy-files": "copyfiles -u 1 src/**/*.ejs lib/",
+    "build:watch": "concurrently npm:build:watch:*",
+    "build:watch:ts": "rimraf lib/* && tsc --watch -p .",
+    "build:watch:ejs": "npm-watch copy-files"
   },
   "repository": {
     "type": "git",
@@ -48,9 +59,11 @@
     "@types/ejs": "^3.1.1",
     "@types/figlet": "^1.2.1",
     "@types/node": "^14.14.21",
+    "concurrently": "^7.4.0",
     "copyfiles": "^2.4.1",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.3",
+    "npm-watch": "^0.11.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2"
   },
