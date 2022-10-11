@@ -13,11 +13,17 @@ export interface IOrder {
   quantity: number;
 }
 
+export interface IPair {
+  asset1: string;
+  asset2: string;
+}
+
 export default abstract class Api {
   protected key: string;
   protected secret: string;
   abstract buy: ({ pair, ammount }: BuyParams) => Promise<IOrder>;
   abstract price: (pair: string) => Promise<number>;
+  abstract assets: (pair: string) => IPair;
 
   constructor(key: string, secret: string) {
     this.key = key;

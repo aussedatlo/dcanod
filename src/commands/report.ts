@@ -1,26 +1,89 @@
 import ejs from 'ejs';
-import fs from 'fs';
-import path from 'path';
-import util from 'util';
-import { IOrder } from '../api/api';
+import { getTemplate } from '../utils/file';
+import { IOrder, IPair } from '../api/api';
 import { getConfigPath, IConfig, readConfig } from '../utils/config';
 import { getAllPairOrders } from '../utils/sqlite';
+import { getApi } from '../api/utils';
 
 const { context } = require('../utils/context');
 
-const getChart1Data = (orders: Array<IOrder>) => {
-  return orders.reduce(
+// change default ejs delimiter to avoid
+// unwanted html check errors
+ejs.delimiter = '/';
+ejs.openDelimiter = '[';
+ejs.closeDelimiter = ']';
+
+const getChartOrderQuantity = async (
+  orders: Array<IOrder>,
+  assets: IPair
+): Promise<string> => {
+  let template = await getTemplate('orders');
+
+  const data = orders.reduce(
     (prev, curr) => {
       return {
+        ...prev,
         label: [
           ...prev.label,
           '"' + new Date(Number(curr.time)).toLocaleDateString() + '"',
         ],
-        data: [...prev.data, curr.quantity],
+        dataset_1: [...prev.dataset_1, curr.quantity],
+        dataset_2: [...prev.dataset_2, curr.quantity * curr.price],
       };
     },
-    { label: [], data: [] }
+    {
+      label: [],
+      dataset_1: [],
+      dataset_2: [],
+      asset1: assets.asset1,
+      asset2: assets.asset2,
+    }
   );
+
+  return ejs.render(template, data);
+};
+
+const getChartBalanceOverTime = async (
+  orders: Array<IOrder>,
+  assets: IPair
+): Promise<string> => {
+  let template = await getTemplate('balance');
+
+  const data = orders.reduce(
+    (prev, curr, index) => {
+      return {
+        ...prev,
+        label: [
+          ...prev.label,
+          '"' + new Date(Number(curr.time)).toLocaleDateString() + '"',
+        ],
+        dataset_1: [
+          ...prev.dataset_1,
+          curr.quantity + (index > 0 ? prev.dataset_1[index - 1] : 0),
+        ],
+        dataset_2: [
+          ...prev.dataset_2,
+          curr.quantity * curr.price +
+            (index > 0 ? prev.dataset_2[index - 1] : 0),
+        ],
+        dataset_3: [
+          ...prev.dataset_3,
+          curr.price *
+            (curr.quantity + (index > 0 ? prev.dataset_1[index - 1] : 0)),
+        ],
+      };
+    },
+    {
+      label: [],
+      dataset_1: [],
+      dataset_2: [],
+      dataset_3: [],
+      asset1: assets.asset1,
+      asset2: assets.asset2,
+    }
+  );
+
+  return ejs.render(template, data);
 };
 
 export const report = async (pair: string, options: any) => {
@@ -28,18 +91,18 @@ export const report = async (pair: string, options: any) => {
   const config: IConfig = readConfig(configPath);
   const { platform, key, secret } = config;
   const orders: Array<IOrder> = await getAllPairOrders(configPath, pair);
+  const api = getApi(platform, key, secret);
+  const assets = api?.assets(pair);
+
+  if (!assets) return;
+
   context.debug = options.debug;
 
-  ejs.delimiter = '/';
-  ejs.openDelimiter = '[';
-  ejs.closeDelimiter = ']';
+  const header = await getTemplate('header');
 
-  let template = await util.promisify(fs.readFile)(
-    path.join(__dirname, '/../template/report.ejs'),
-    'utf-8'
-  );
-  let t = ejs.render(template, getChart1Data(orders));
-  console.log(t);
+  console.log(header);
+  console.log(await getChartOrderQuantity(orders, assets));
+  console.log(await getChartBalanceOverTime(orders, assets));
 };
 
 export default report;

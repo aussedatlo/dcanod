@@ -1,0 +1,66 @@
+<script>
+  const chart_balance_labels = [
+    [/- label; /]
+  ];
+
+  const chart_balance_data = {
+    labels: chart_balance_labels,
+    datasets: [{
+      label: 'Balance of [/- asset1 -/]',
+      backgroundColor: 'rgba(255, 159, 64, 0.2)',
+      borderColor: 'rgb(255, 159, 64)',
+      data: [
+        [/- dataset_1; /]
+      ],
+      yAxisID: 'balance_dataset_1',
+      borderWidth: 1
+    },
+    {
+      label: 'Investment',
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgb(54, 162, 235)',
+      data: [
+        [/- dataset_2; /]
+      ],
+      yAxisID: 'balance_dataset_2',
+      borderWidth: 1
+    },
+    {
+      label: 'Balance of [/- asset1 -/] in [/- asset2 -/]',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgb(75, 192, 192)',
+      data: [
+        [/- dataset_3; /]
+      ],
+      yAxisID: 'balance_dataset_2',
+      borderWidth: 1
+    }
+    ]
+  };
+
+  const chart_balance_config = {
+    type: 'line',
+    data: chart_balance_data,
+    options: {
+      scales: {
+        balance_dataset_1: {
+          title: { display: true, text: "[/- asset1 /]" },
+          type: 'linear',
+          position: 'left',
+        },
+        balance_dataset_2: {
+          title: { display: true, text: "[/- asset2 /]" },
+          type: 'linear',
+          position: 'right', // `axis` is determined by the position as `'y'`
+        },
+      }
+    }
+  }
+</script>
+
+<script>
+  const chartBalance = new Chart(
+    document.getElementById('chart_balance'),
+    chart_balance_config
+  );
+</script>
