@@ -6,24 +6,25 @@
   const orders_data = {
     labels: orders_labels,
     datasets: [{
-      label: 'Quantity of [/- asset1 -/] purchased by orders',
+      label: '[/- asset1 -/] purchased',
       backgroundColor: 'rgba(255, 159, 64, 0.2)',
       borderColor: 'rgb(255, 159, 64)',
       data: [
         [/- dataset_1; /]
       ],
       yAxisID: 'orders_dataset1',
-      borderWidth: 1
+      borderWidth: 2
     },
     {
-      label: 'Quantity of [/- asset2 -/] sold by orders',
+      type: "line",
+      label: '[/- asset2 -/] sold',
       backgroundColor: 'rgba(54, 162, 235, 0.2)',
       borderColor: 'rgb(54, 162, 235)',
       data: [
         [/- dataset_2; /]
       ],
       yAxisID: 'orders_dataset2',
-      borderWidth: 1
+      borderWidth: 2
     }
     ]
   };
@@ -34,14 +35,14 @@
     options: {
       scales: {
         orders_dataset1: {
-          title: { display: true, text: "[/- asset1 /]" },
+          title: { display: true, text: "[/- asset1 /]", color: "#FFFFFF" },
           type: 'linear',
           position: 'left',
         },
         orders_dataset2: {
-          title: { display: true, text: "[/- asset2 /]" },
+          title: { display: true, text: "[/- asset2 /]", color: "#FFFFFF" },
           type: 'linear',
-          position: 'right', // `axis` is determined by the position as `'y'`
+          position: 'right',
         },
       }
     }

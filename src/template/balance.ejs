@@ -13,7 +13,7 @@
         [/- dataset_1; /]
       ],
       yAxisID: 'balance_dataset_1',
-      borderWidth: 1
+      borderWidth: 2
     },
     {
       label: 'Investment',
@@ -23,7 +23,7 @@
         [/- dataset_2; /]
       ],
       yAxisID: 'balance_dataset_2',
-      borderWidth: 1
+      borderWidth: 2
     },
     {
       label: 'Balance of [/- asset1 -/] in [/- asset2 -/]',
@@ -33,27 +33,29 @@
         [/- dataset_3; /]
       ],
       yAxisID: 'balance_dataset_2',
-      borderWidth: 1
-    }
+      borderWidth: 2
+    },
     ]
   };
 
   const chart_balance_config = {
     type: 'line',
     data: chart_balance_data,
+    responsive: true,
     options: {
       scales: {
         balance_dataset_1: {
-          title: { display: true, text: "[/- asset1 /]" },
+          display: true,
+          title: { display: true, text: "[/- asset1 /]", color: "#FFFFFF" },
           type: 'linear',
           position: 'left',
         },
         balance_dataset_2: {
-          title: { display: true, text: "[/- asset2 /]" },
+          title: { display: true, text: "[/- asset2 /]", color: "#FFFFFF" },
           type: 'linear',
-          position: 'right', // `axis` is determined by the position as `'y'`
+          position: 'right',
         },
-      }
+      },
     }
   }
 </script>
