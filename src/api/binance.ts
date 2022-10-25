@@ -59,4 +59,9 @@ export class Binance extends Api {
     const res = await this.client.avgPrice({ symbol: pair });
     return parseFloat(res.price);
   };
+
+  // TODO
+  assets = (pair: string) => {
+    return { asset1: '', asset2: '' };
+  };
 }

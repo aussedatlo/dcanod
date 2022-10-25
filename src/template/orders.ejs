@@ -1,0 +1,57 @@
+<script>
+  const orders_labels = [
+    [/- label; /]
+  ];
+
+  const orders_data = {
+    labels: orders_labels,
+    datasets: [{
+      label: '[/- asset1 -/] purchased',
+      backgroundColor: 'rgba(255, 159, 64, 0.2)',
+      borderColor: 'rgb(255, 159, 64)',
+      data: [
+        [/- dataset_1; /]
+      ],
+      yAxisID: 'orders_dataset1',
+      borderWidth: 2
+    },
+    {
+      type: "line",
+      label: '[/- asset2 -/] sold',
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgb(54, 162, 235)',
+      data: [
+        [/- dataset_2; /]
+      ],
+      yAxisID: 'orders_dataset2',
+      borderWidth: 2
+    }
+    ]
+  };
+
+  const orders_config = {
+    type: 'bar',
+    data: orders_data,
+    options: {
+      scales: {
+        orders_dataset1: {
+          title: { display: true, text: "[/- asset1 /]", color: "#FFFFFF" },
+          type: 'linear',
+          position: 'left',
+        },
+        orders_dataset2: {
+          title: { display: true, text: "[/- asset2 /]", color: "#FFFFFF" },
+          type: 'linear',
+          position: 'right',
+        },
+      }
+    }
+  };
+</script>
+
+<script>
+  const chartOrderQuantity = new Chart(
+    document.getElementById('chart_order_quantity'),
+    orders_config
+  );
+</script>

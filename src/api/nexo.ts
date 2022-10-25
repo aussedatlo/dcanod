@@ -55,4 +55,8 @@ export class Nexo extends Api {
     });
     return res.price;
   };
+
+  assets = (pair: string) => {
+    return { asset1: pair.split('/')[0], asset2: pair.split('/')[1] };
+  };
 }
