@@ -6,12 +6,8 @@ import figlet from 'figlet';
 import path from 'path';
 import buy_cmd from 'src/commands/buy';
 import setup_cmd from 'src/commands/setup';
+import { Options } from 'src/types/app';
 import { logErr } from 'src/utils/utils';
-
-interface IOptions {
-  ConfigPath?: string;
-  debug?: boolean;
-}
 
 const pkg = require(path.join(__dirname, '../package.json'));
 
@@ -39,7 +35,7 @@ const main = async () => {
     .description('configure dcanod test')
     .option('-d, --debug', 'output extra debugging information')
     .option('-p, --config-path <path>', 'path to the config folder')
-    .action((options: IOptions) => {
+    .action((options: Options) => {
       setup_cmd(options);
     });
 
@@ -50,7 +46,7 @@ const main = async () => {
     .description('buy <ammount> of crypto using <pair>')
     .option('-d, --debug', 'output extra debugging information')
     .option('-p, --config-path <path>', 'path to the config folder')
-    .action((pair: string, ammount: number, options: IOptions) => {
+    .action((pair: string, ammount: number, options: Options) => {
       buy_cmd({ pair, ammount, options });
     });
 
