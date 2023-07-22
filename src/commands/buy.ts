@@ -1,6 +1,6 @@
 import { Nexo } from '../api/nexo';
 import { IOrder } from '../types/api';
-import { IConfig, getConfigPath, readConfig } from '../utils/config';
+import { Config, getConfigPath, readConfig } from '../utils/config';
 import { logDebug, logOk } from '../utils/utils';
 
 const { context } = require('../utils/context');
@@ -14,7 +14,7 @@ export interface Params {
 const buy = async ({ pair, ammount, options }: Params) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
-  const config: IConfig = readConfig(path);
+  const config: Config = readConfig(path);
   const { key, secret } = config;
   context.debug = debug;
 
