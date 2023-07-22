@@ -1,7 +1,7 @@
 import { Nexo } from '../api/nexo';
-import Api, { IOrder } from '../types/api';
+import { IOrder } from '../types/api';
 import { IConfig, getConfigPath, readConfig } from '../utils/config';
-import { logDebug, logErr, logOk } from '../utils/utils';
+import { logDebug, logOk } from '../utils/utils';
 
 const { context } = require('../utils/context');
 
@@ -20,21 +20,16 @@ const buy = async ({ pair, ammount, options }: Params) => {
 
   logDebug('using path ' + path);
 
-  let api: Api = new Nexo(key, secret);
-
-  if (api) {
-    const order: IOrder = await api.buy({ pair, ammount });
-    logOk(
-      'order created: ' +
-        pair +
-        ', quantity: ' +
-        parseFloat(order.quantity.toString()) +
-        ', price: ' +
-        parseFloat(order.price.toString())
-    );
-  } else {
-    logErr('no compatible api found');
-  }
+  let api = Nexo(key, secret);
+  const order: IOrder = await api.buy({ pair, ammount });
+  logOk(
+    'order created: ' +
+      pair +
+      ', quantity: ' +
+      parseFloat(order.quantity.toString()) +
+      ', price: ' +
+      parseFloat(order.price.toString())
+  );
 };
 
 export default buy;

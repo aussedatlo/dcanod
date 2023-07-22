@@ -1,21 +1,16 @@
 import { Client } from 'nexo-pro';
 import { QuoteResponse } from 'nexo-pro/lib/types/client';
+import { BuyParams, IOrder } from '../types/api';
 import { logDebug } from '../utils/utils';
-import Api, { BuyParams, IOrder } from '../types/api';
 
-export class Nexo extends Api {
-  private client: Client;
+export const Nexo = (key: string, secret: string) => {
+  const client = new Client({
+    api_key: key,
+    api_secret: secret,
+  });
 
-  constructor(key: string, secret: string) {
-    super(key, secret);
-    this.client = new Client({
-      api_key: this.key,
-      api_secret: this.secret,
-    });
-  }
-
-  buy = async ({ pair, ammount }: BuyParams) => {
-    const quoteResponse: QuoteResponse = await this.client.getQuote({
+  const buy = async ({ pair, ammount }: BuyParams) => {
+    const quoteResponse: QuoteResponse = await client.getQuote({
       pair: pair,
       amount: ammount,
       side: 'buy',
@@ -27,7 +22,7 @@ export class Nexo extends Api {
 
     logDebug(`amount to buy: ${amountOut}`);
 
-    const id = await this.client.placeOrder({
+    const id = await client.placeOrder({
       pair: pair,
       side: 'buy',
       type: 'market',
@@ -47,16 +42,5 @@ export class Nexo extends Api {
     return order;
   };
 
-  price = async (pair: string) => {
-    const res: QuoteResponse = await this.client.getQuote({
-      pair: pair,
-      amount: 1,
-      side: 'buy',
-    });
-    return res.price;
-  };
-
-  assets = (pair: string) => {
-    return { asset1: pair.split('/')[0], asset2: pair.split('/')[1] };
-  };
-}
+  return { buy };
+};
