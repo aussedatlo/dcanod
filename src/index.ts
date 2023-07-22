@@ -36,6 +36,15 @@ const main = async () => {
     );
 
   program
+    .command('setup')
+    .description('configure dcanod test')
+    .option('-d, --debug', 'output extra debugging information')
+    .option('-p, --config-path <path>', 'path to the config folder')
+    .action((options: IOptions) => {
+      setup_cmd(options);
+    });
+
+  program
     .command('buy')
     .arguments('<pair>')
     .arguments('<ammount>')
