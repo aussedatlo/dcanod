@@ -1,5 +1,5 @@
 import { getAllOrders } from '../utils/sqlite';
-import { IOrder } from '../api/api';
+import { IOrder } from '../types/api';
 import { getConfigPath } from '../utils/config';
 
 export const list = async (options: any) => {

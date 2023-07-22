@@ -1,6 +1,6 @@
 import ApiBinance from 'binance-api-node';
 import { logDebug } from '../utils/utils';
-import Api, { BuyParams, IOrder } from './api';
+import Api, { BuyParams, IOrder } from '../types/api';
 
 const FILTER_LOT_SIZE = 'LOT_SIZE';
 

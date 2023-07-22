@@ -1,7 +1,7 @@
 import { Client } from 'nexo-pro';
 import { QuoteResponse } from 'nexo-pro/lib/types/client';
 import { logDebug } from '../utils/utils';
-import Api, { BuyParams, IOrder } from './api';
+import Api, { BuyParams, IOrder } from '../types/api';
 
 export class Nexo extends Api {
   private client: Client;

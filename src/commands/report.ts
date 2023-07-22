@@ -1,6 +1,6 @@
 import ejs from 'ejs';
 import { getTemplate } from '../utils/file';
-import { IOrder, IPair } from '../api/api';
+import { IOrder, IPair } from '../types/api';
 import { getConfigPath, IConfig, readConfig } from '../utils/config';
 import { getAllPairOrders } from '../utils/sqlite';
 import { getApi } from '../api/utils';

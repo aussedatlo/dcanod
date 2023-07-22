@@ -1,22 +1,22 @@
-export interface BuyParams {
+export type BuyParams = {
   pair: string;
   ammount: number;
-}
+};
 
 export type SupportedPlatform = 'binance' | 'nexo';
 
-export interface IOrder {
+export type IOrder = {
   pair: string;
   id: number | string;
   time: number;
   price: number;
   quantity: number;
-}
+};
 
-export interface IPair {
+export type IPair = {
   asset1: string;
   asset2: string;
-}
+};
 
 export default abstract class Api {
   protected key: string;

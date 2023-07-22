@@ -1,5 +1,5 @@
 import { Database, verbose } from 'sqlite3';
-import { IOrder } from 'src/api/api';
+import { IOrder } from 'src/types/api';
 import { format } from 'util';
 import { logErr } from './utils';
 

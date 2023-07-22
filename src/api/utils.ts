@@ -1,4 +1,4 @@
-import Api, { SupportedPlatform } from './api';
+import Api, { SupportedPlatform } from '../types/api';
 import { Binance } from './binance';
 import { Nexo } from './nexo';
 

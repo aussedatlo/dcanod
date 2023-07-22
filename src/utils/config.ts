@@ -1,5 +1,5 @@
 import path from 'path';
-import { SupportedPlatform } from '../api/api';
+import { SupportedPlatform } from '../types/api';
 import { CONFIG_FILE, CONFIG_FOLDER } from './constant';
 
 export interface IConfig {

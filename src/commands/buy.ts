@@ -1,5 +1,5 @@
 import { createOrder, init } from '../utils/sqlite';
-import Api, { IOrder } from '../api/api';
+import Api, { IOrder } from '../types/api';
 import { getApi } from '../api/utils';
 import { getConfigPath, IConfig, readConfig } from '../utils/config';
 import { logDebug, logErr, logOk } from '../utils/utils';
