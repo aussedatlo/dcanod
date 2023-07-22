@@ -1,7 +1,6 @@
 import { Nexo } from '../api/nexo';
 import Api, { IOrder } from '../types/api';
 import { IConfig, getConfigPath, readConfig } from '../utils/config';
-import { createOrder, init } from '../utils/sqlite';
 import { logDebug, logErr, logOk } from '../utils/utils';
 
 const { context } = require('../utils/context');
@@ -18,7 +17,6 @@ const buy = async ({ pair, ammount, options }: Params) => {
   const config: IConfig = readConfig(path);
   const { key, secret } = config;
   context.debug = debug;
-  await init(path);
 
   logDebug('using path ' + path);
 
@@ -26,7 +24,6 @@ const buy = async ({ pair, ammount, options }: Params) => {
 
   if (api) {
     const order: IOrder = await api.buy({ pair, ammount });
-
     logOk(
       'order created: ' +
         pair +
@@ -35,8 +32,6 @@ const buy = async ({ pair, ammount, options }: Params) => {
         ', price: ' +
         parseFloat(order.price.toString())
     );
-
-    createOrder(path, order);
   } else {
     logErr('no compatible api found');
   }
