@@ -1,7 +1,8 @@
-import { Nexo } from '../api/nexo';
-import { IOrder } from '../types/api';
-import { Config, getConfigPath, readConfig } from '../utils/config';
-import { logDebug, logOk } from '../utils/utils';
+import { Nexo } from 'src/api/nexo';
+import { IOrder } from 'src/types/api';
+import { Config } from 'src/types/config';
+import { getConfigPath, readConfig } from 'src/utils/config';
+import { logDebug, logOk } from 'src/utils/utils';
 
 const { context } = require('../utils/context');
 
