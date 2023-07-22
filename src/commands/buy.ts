@@ -1,7 +1,7 @@
-import { createOrder, init } from '../utils/sqlite';
+import { Nexo } from '../api/nexo';
 import Api, { IOrder } from '../types/api';
-import { getApi } from '../api/utils';
-import { getConfigPath, IConfig, readConfig } from '../utils/config';
+import { IConfig, getConfigPath, readConfig } from '../utils/config';
+import { createOrder, init } from '../utils/sqlite';
 import { logDebug, logErr, logOk } from '../utils/utils';
 
 const { context } = require('../utils/context');
@@ -16,13 +16,13 @@ const buy = async ({ pair, ammount, options }: Params) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
   const config: IConfig = readConfig(path);
-  const { platform, key, secret } = config;
+  const { key, secret } = config;
   context.debug = debug;
   await init(path);
 
   logDebug('using path ' + path);
 
-  let api: Api | undefined = getApi(platform, key, secret);
+  let api: Api = new Nexo(key, secret);
 
   if (api) {
     const order: IOrder = await api.buy({ pair, ammount });

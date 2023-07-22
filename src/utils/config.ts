@@ -1,9 +1,7 @@
 import path from 'path';
-import { SupportedPlatform } from '../types/api';
 import { CONFIG_FILE, CONFIG_FOLDER } from './constant';
 
 export interface IConfig {
-  platform: SupportedPlatform;
   key: string;
   secret: string;
 }

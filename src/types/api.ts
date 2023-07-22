@@ -3,8 +3,6 @@ export type BuyParams = {
   ammount: number;
 };
 
-export type SupportedPlatform = 'binance' | 'nexo';
-
 export type IOrder = {
   pair: string;
   id: number | string;

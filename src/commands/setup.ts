@@ -15,15 +15,6 @@ const setup_cmd = async (options: any) => {
 
   const response = await prompts([
     {
-      type: 'select',
-      name: 'platform',
-      message: 'Select your platform: ',
-      choices: [
-        { title: 'Binance', value: 'binance' },
-        { title: 'Nexo Pro', value: 'nexo' },
-      ],
-    },
-    {
       type: 'text',
       name: 'key',
       message: 'Api key: ',
@@ -43,7 +34,7 @@ const setup_cmd = async (options: any) => {
     },
   ]);
 
-  if (!response.key || !response.secret || !response.platform) {
+  if (!response.key || !response.secret) {
     logErr('incorrect setup');
   }
 

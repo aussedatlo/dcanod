@@ -1,10 +1,10 @@
 import ejs from 'ejs';
-import { getTemplate } from '../utils/file';
+import { Nexo } from '../api/nexo';
 import { IOrder, IPair } from '../types/api';
-import { getConfigPath, IConfig, readConfig } from '../utils/config';
-import { getAllPairOrders } from '../utils/sqlite';
-import { getApi } from '../api/utils';
+import { IConfig, getConfigPath, readConfig } from '../utils/config';
+import { getTemplate } from '../utils/file';
 import { quantile } from '../utils/math';
+import { getAllPairOrders } from '../utils/sqlite';
 
 const { context } = require('../utils/context');
 
@@ -125,9 +125,9 @@ const getStats = (orders: Array<IOrder>) => {
 export const report = async (pair: string, options: any) => {
   const configPath = getConfigPath(options.configPath);
   const config: IConfig = readConfig(configPath);
-  const { platform, key, secret } = config;
+  const { key, secret } = config;
   const orders: Array<IOrder> = await getAllPairOrders(configPath, pair);
-  const api = getApi(platform, key, secret);
+  const api = new Nexo(key, secret);
   const assets = api?.assets(pair);
 
   if (!assets) return;
