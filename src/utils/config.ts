@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { Config } from 'src/types/config';
-import { CONFIG_FILE, CONFIG_FOLDER } from './constant';
+import { CONFIG_FILE, CONFIG_FOLDER } from 'src/utils/constant';
 
 export const getConfigPath = (folder_path: string) => {
   return folder_path ? folder_path + '/' : CONFIG_FOLDER + '/';

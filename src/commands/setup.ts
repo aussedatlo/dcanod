@@ -1,6 +1,10 @@
-import { createConfigFolder, getConfigPath, saveConfig } from '../utils/config';
-import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '../utils/constant';
-import { logDebug, logErr, logOk } from '../utils/utils';
+import {
+  createConfigFolder,
+  getConfigPath,
+  saveConfig,
+} from 'src/utils/config';
+import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from 'src/utils/constant';
+import { logDebug, logErr, logOk } from 'src/utils/utils';
 
 const prompts = require('prompts');
 const { context } = require('../utils/context');

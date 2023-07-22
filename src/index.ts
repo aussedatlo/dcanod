@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-import path from 'path';
+import chalk from 'chalk';
 import program from 'commander';
 import figlet from 'figlet';
-import chalk from 'chalk';
-
-import setup_cmd from './commands/setup';
-import buy_cmd from './commands/buy';
-import { logErr } from './utils/utils';
+import path from 'path';
+import buy_cmd from 'src/commands/buy';
+import setup_cmd from 'src/commands/setup';
+import { logErr } from 'src/utils/utils';
 
 interface IOptions {
   ConfigPath?: string;
