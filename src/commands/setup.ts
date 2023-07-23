@@ -1,18 +1,14 @@
-import {
-  createConfigFolder,
-  getConfigPath,
-  saveConfig,
-} from '@app/utils/config';
+import { Options } from '@app/types/app';
+import { getConfigPath, saveConfig } from '@app/utils/config';
 import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
 import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
 import prompts from 'prompts';
 
-const setup_cmd = async (options: any) => {
-  const { debug, configPath } = options;
+const setup_cmd = async ({ debug, configPath }: Options) => {
   const path = getConfigPath(configPath);
   if (debug) setDebug();
 
-  logDebug('using path ' + path);
+  logDebug(`using path ${path}`);
 
   const response = await prompts([
     {
@@ -39,10 +35,7 @@ const setup_cmd = async (options: any) => {
     logErr('incorrect setup');
   }
 
-  const json_data = JSON.stringify(response);
-
-  createConfigFolder(path);
-  saveConfig(json_data, path);
+  saveConfig(response, configPath);
   logOk('Configuration saved');
 };
 

@@ -1,4 +1,4 @@
 export type Options = {
-  ConfigPath?: string;
+  configPath?: string;
   debug?: boolean;
 };
