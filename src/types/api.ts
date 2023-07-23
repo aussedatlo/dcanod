@@ -3,15 +3,10 @@ export type BuyParams = {
   ammount: number;
 };
 
-export type IOrder = {
+export type OrderResult = {
   pair: string;
   id: number | string;
   time: number;
   price: number;
   quantity: number;
-};
-
-export type IPair = {
-  asset1: string;
-  asset2: string;
 };

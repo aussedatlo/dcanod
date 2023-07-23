@@ -47,7 +47,7 @@ const main = async () => {
     .option('-d, --debug', 'output extra debugging information')
     .option('-p, --config-path <path>', 'path to the config folder')
     .action((pair: string, ammount: number, options: Options) => {
-      buy_cmd({ pair, ammount, options });
+      buy_cmd({ pair, ammount }, options);
     });
 
   program.on('command:*', (commands?: string[]) => {

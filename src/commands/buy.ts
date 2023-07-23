@@ -1,18 +1,12 @@
 import { Nexo } from '@app/api/nexo';
-import { IOrder } from '@app/types/api';
+import { BuyParams, OrderResult } from '@app/types/api';
 import { Config } from '@app/types/config';
 import { getConfigPath, readConfig } from '@app/utils/config';
 import { logDebug, logOk } from '@app/utils/utils';
 
 const { context } = require('../utils/context');
 
-export interface Params {
-  readonly pair: string;
-  readonly ammount: number;
-  readonly options: any;
-}
-
-const buy = async ({ pair, ammount, options }: Params) => {
+const buy = async ({ pair, ammount }: BuyParams, options: any) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
   const config: Config = readConfig(path);
@@ -22,7 +16,7 @@ const buy = async ({ pair, ammount, options }: Params) => {
   logDebug('using path ' + path);
 
   let api = Nexo(key, secret);
-  const order: IOrder = await api.buy({ pair, ammount });
+  const order: OrderResult = await api.buy({ pair, ammount });
   logOk(
     'order created: ' +
       pair +

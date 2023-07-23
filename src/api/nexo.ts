@@ -1,4 +1,4 @@
-import { BuyParams, IOrder } from '@app/types/api';
+import { BuyParams, OrderResult } from '@app/types/api';
 import { logDebug } from '@app/utils/utils';
 import { Client } from 'nexo-pro';
 import { QuoteResponse } from 'nexo-pro/lib/types/client';
@@ -31,7 +31,7 @@ export const Nexo = (key: string, secret: string) => {
 
     logDebug(id);
 
-    const order: IOrder = {
+    const order: OrderResult = {
       pair: pair,
       id: id.orderId,
       time: Date.now(),
