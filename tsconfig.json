@@ -14,7 +14,10 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "lib": ["es2021", "dom"],
-    "baseUrl": ".",
+    "baseUrl": "src",
+    "paths": {
+      "@app/*": ["./*"]
+    },
     "outDir": "lib"
   },
   "include": ["src/**/*"],

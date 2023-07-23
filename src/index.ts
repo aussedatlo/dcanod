@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
+import buy_cmd from '@app/commands/buy';
+import setup_cmd from '@app/commands/setup';
+import { Options } from '@app/types/app';
+import { logErr } from '@app/utils/utils';
 import chalk from 'chalk';
 import program from 'commander';
 import figlet from 'figlet';
 import path from 'path';
-import buy_cmd from 'src/commands/buy';
-import setup_cmd from 'src/commands/setup';
-import { Options } from 'src/types/app';
-import { logErr } from 'src/utils/utils';
 
 const pkg = require(path.join(__dirname, '../package.json'));
 

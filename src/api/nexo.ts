@@ -1,7 +1,7 @@
+import { BuyParams, IOrder } from '@app/types/api';
+import { logDebug } from '@app/utils/utils';
 import { Client } from 'nexo-pro';
 import { QuoteResponse } from 'nexo-pro/lib/types/client';
-import { BuyParams, IOrder } from 'src/types/api';
-import { logDebug } from 'src/utils/utils';
 
 export const Nexo = (key: string, secret: string) => {
   const client = new Client({
