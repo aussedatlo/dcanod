@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import pkg from '@app/../package.json';
 import buy_cmd from '@app/commands/buy';
 import setup_cmd from '@app/commands/setup';
 import { Options } from '@app/types/app';
@@ -7,9 +8,6 @@ import { logErr } from '@app/utils/utils';
 import chalk from 'chalk';
 import program from 'commander';
 import figlet from 'figlet';
-import path from 'path';
-
-const pkg = require(path.join(__dirname, '../package.json'));
 
 const main = async () => {
   program

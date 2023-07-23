@@ -13,10 +13,11 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "lib": ["es2021", "dom"],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@app/*": ["./*"]
+      "@app/*": ["./src/*"]
     },
     "outDir": "lib"
   },
