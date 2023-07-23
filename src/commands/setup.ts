@@ -4,15 +4,13 @@ import {
   saveConfig,
 } from '@app/utils/config';
 import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
-import { logDebug, logErr, logOk } from '@app/utils/logger';
+import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
 import prompts from 'prompts';
-
-const { context } = require('../utils/context');
 
 const setup_cmd = async (options: any) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
-  context.debug = debug;
+  if (debug) setDebug();
 
   logDebug('using path ' + path);
 

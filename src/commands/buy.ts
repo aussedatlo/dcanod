@@ -2,16 +2,14 @@ import { Nexo } from '@app/api/nexo';
 import { BuyParams, OrderResult } from '@app/types/api';
 import { Config } from '@app/types/config';
 import { getConfigPath, readConfig } from '@app/utils/config';
-import { logDebug, logOk } from '@app/utils/logger';
-
-const { context } = require('../utils/context');
+import { logDebug, logOk, setDebug } from '@app/utils/logger';
 
 const buy = async ({ pair, ammount }: BuyParams, options: any) => {
   const { debug, configPath } = options;
   const path = getConfigPath(configPath);
   const config: Config = readConfig(path);
   const { key, secret } = config;
-  context.debug = debug;
+  if (debug) setDebug();
 
   logDebug('using path ' + path);
 
