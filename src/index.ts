@@ -4,7 +4,7 @@ import pkg from '@app/../package.json';
 import buy_cmd from '@app/commands/buy';
 import setup_cmd from '@app/commands/setup';
 import { Options } from '@app/types/app';
-import { logErr } from '@app/utils/utils';
+import { logErr } from '@app/utils/logger';
 import chalk from 'chalk';
 import program from 'commander';
 import figlet from 'figlet';

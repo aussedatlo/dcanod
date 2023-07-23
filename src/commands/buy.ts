@@ -2,7 +2,7 @@ import { Nexo } from '@app/api/nexo';
 import { BuyParams, OrderResult } from '@app/types/api';
 import { Config } from '@app/types/config';
 import { getConfigPath, readConfig } from '@app/utils/config';
-import { logDebug, logOk } from '@app/utils/utils';
+import { logDebug, logOk } from '@app/utils/logger';
 
 const { context } = require('../utils/context');
 

@@ -1,5 +1,5 @@
 import { BuyParams, OrderResult } from '@app/types/api';
-import { logDebug } from '@app/utils/utils';
+import { logDebug } from '@app/utils/logger';
 import { Client } from 'nexo-pro';
 import { QuoteResponse } from 'nexo-pro/lib/types/client';
 

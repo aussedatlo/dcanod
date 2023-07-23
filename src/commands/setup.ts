@@ -4,7 +4,7 @@ import {
   saveConfig,
 } from '@app/utils/config';
 import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
-import { logDebug, logErr, logOk } from '@app/utils/utils';
+import { logDebug, logErr, logOk } from '@app/utils/logger';
 
 const prompts = require('prompts');
 const { context } = require('../utils/context');
