@@ -22,24 +22,22 @@ export const Nexo = (key: string, secret: string) => {
 
     logDebug(`amount to buy: ${amountOut}`);
 
-    const id = await client.placeOrder({
+    const orderResponse = await client.placeOrder({
       pair: pair,
       side: 'buy',
       type: 'market',
       quantity: amountOut,
     });
 
-    logDebug(id);
+    logDebug(orderResponse);
 
-    const order: OrderResult = {
-      pair: pair,
-      id: id.orderId,
-      time: Date.now(),
-      price: quoteResponse.price,
-      quantity: amountOut,
-    };
+    const orderDetails = await client.getOrderDetails({
+      id: orderResponse.orderId,
+    });
 
-    return order;
+    logDebug(orderResponse);
+
+    return orderDetails;
   };
 
   return { buy };

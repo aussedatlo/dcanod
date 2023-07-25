@@ -1,5 +1,8 @@
 export type Config = {
-  key: string;
-  secret: string;
-  path?: string;
+  apiKey: string;
+  apiSecret: string;
+  gfHostname: string;
+  gfPort: string;
+  gfSecret: string;
+  configPath?: string;
 };

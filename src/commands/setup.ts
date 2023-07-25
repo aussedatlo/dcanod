@@ -13,7 +13,7 @@ const setup_cmd = async ({ debug, configPath }: Options) => {
   const response = await prompts([
     {
       type: 'text',
-      name: 'key',
+      name: 'apiKey',
       message: 'Api key: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
@@ -22,16 +22,37 @@ const setup_cmd = async ({ debug, configPath }: Options) => {
     },
     {
       type: 'password',
-      name: 'secret',
+      name: 'apiSecret',
       message: 'Api secret: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
           ? 'incorrect Api key'
           : true,
     },
+    {
+      type: 'text',
+      name: 'gfHostname',
+      message: 'Ghostfolio hostname: ',
+    },
+    {
+      type: 'number',
+      name: 'gfPort',
+      message: 'Ghostfolio port: ',
+    },
+    {
+      type: 'password',
+      name: 'gfSecret',
+      message: 'Ghostfolio secret: ',
+    },
   ]);
 
-  if (!response.key || !response.secret) {
+  if (
+    !response.apiKey ||
+    !response.apiKey ||
+    !response.gfHostname ||
+    !response.gfPort ||
+    !response.gfSecret
+  ) {
     logErr('incorrect setup');
   }
 
