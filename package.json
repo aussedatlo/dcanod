@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/aussedatlo/dcanod#readme",
   "bin": {
-    "dcanod-cli": "lib/index.js"
+    "dcanod-cli": "lib/src/index.js"
   },
   "dependencies": {
     "chalk": "^4.1.0",
