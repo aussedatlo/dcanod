@@ -1,13 +1,31 @@
-import { BuyParams, OrderResult } from '@app/types/api';
+import { BuyParams } from '@app/types/api';
 import { logDebug } from '@app/utils/logger';
-import { Client } from 'nexo-pro';
-import { QuoteResponse } from 'nexo-pro/lib/types/client';
+import Client from 'nexo-pro';
+import {
+  QuoteResponse,
+  SpecificOrderResponse,
+} from 'nexo-pro/lib/types/client';
 
 export const Nexo = (key: string, secret: string) => {
-  const client = new Client({
+  const client = Client({
     api_key: key,
     api_secret: secret,
   });
+
+  const getOrderDetails = async (
+    orderId: string
+  ): Promise<SpecificOrderResponse> => {
+    const orderDetails = await client.getOrderDetails({
+      id: orderId,
+    });
+
+    if (orderDetails.trades.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return await getOrderDetails(orderId);
+    }
+
+    return orderDetails;
+  };
 
   const buy = async ({ pair, ammount }: BuyParams) => {
     const quoteResponse: QuoteResponse = await client.getQuote({
@@ -31,11 +49,9 @@ export const Nexo = (key: string, secret: string) => {
 
     logDebug(orderResponse);
 
-    const orderDetails = await client.getOrderDetails({
-      id: orderResponse.orderId,
-    });
+    let orderDetails = await getOrderDetails(orderResponse.orderId);
 
-    logDebug(orderResponse);
+    logDebug(orderDetails);
 
     return orderDetails;
   };

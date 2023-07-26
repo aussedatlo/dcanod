@@ -1,34 +1,26 @@
+import { mockNexoPro } from '../__mocks__/nexo-pro.mock';
 import { Nexo } from '../nexo';
+import * as NexoProModule from 'nexo-pro';
 
 const KEY = 'key';
 const SECRET = 'secret';
 
-const getQuoteMock = jest.fn(() => ({ price: 30400 }));
-const placeOrderMock = jest.fn(() => ({ orderId: 'order-id' }));
-const getOrderDetailsMock = jest.fn(() => ({ id: 'details-id' }));
-
-jest.mock('nexo-pro', () => {
-  return {
-    Client: jest.fn().mockImplementation(() => ({
-      getQuote: getQuoteMock,
-      placeOrder: placeOrderMock,
-      getOrderDetails: getOrderDetailsMock,
-    })),
-  };
-});
+jest.mock('nexo-pro');
 
 describe('Nexo API', () => {
-  let nexo;
-
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods:
     jest.clearAllMocks();
-    nexo = Nexo(KEY, SECRET);
   });
 
   it('should call quote with correct pair, side and amount', async () => {
+    const nexoPro = mockNexoPro();
+    jest.spyOn(NexoProModule, 'default').mockReturnValueOnce(nexoPro as any);
+
+    const nexo = Nexo(KEY, SECRET);
     await nexo.buy({ pair: 'BTC/USD', ammount: 1000 });
-    expect(getQuoteMock).toHaveBeenCalledWith({
+
+    expect(nexoPro.getQuote).toHaveBeenCalledWith({
       pair: 'BTC/USD',
       amount: 1000,
       side: 'buy',
@@ -36,8 +28,13 @@ describe('Nexo API', () => {
   });
 
   it('should place an order with correct amount', async () => {
+    const nexoPro = mockNexoPro();
+    jest.spyOn(NexoProModule, 'default').mockReturnValueOnce(nexoPro as any);
+
+    const nexo = Nexo(KEY, SECRET);
+
     await nexo.buy({ pair: 'BTC/USD', ammount: 1000 });
-    expect(placeOrderMock).toHaveBeenCalledWith({
+    expect(nexoPro.placeOrder).toHaveBeenCalledWith({
       pair: 'BTC/USD',
       quantity: 0.03289473684210526,
       side: 'buy',
@@ -46,10 +43,47 @@ describe('Nexo API', () => {
   });
 
   it('should return the correct order details', async () => {
+    const nexoPro = mockNexoPro();
+    jest.spyOn(NexoProModule, 'default').mockReturnValueOnce(nexoPro as any);
+
+    const nexo = Nexo(KEY, SECRET);
+
     const order = await nexo.buy({ pair: 'BTC/USD', ammount: 1000 });
-    expect(getOrderDetailsMock).toHaveBeenCalledWith({
+    expect(nexoPro.getOrderDetails).toHaveBeenCalledWith({
       id: 'order-id',
     });
-    expect(order).toStrictEqual({ id: 'details-id' });
+    expect(order).toStrictEqual({
+      id: 'details-id',
+      trades: ['fake-trade-1', 'fake-trade-2'],
+    });
+  });
+
+  it('should retry to get order details when no trades', async () => {
+    const nexoPro = mockNexoPro();
+    jest.spyOn(nexoPro, 'getOrderDetails').mockReturnValueOnce({
+      id: 'details-id',
+      trades: [] as any,
+    });
+    jest.spyOn(nexoPro, 'getOrderDetails').mockReturnValueOnce({
+      id: 'details-id',
+      trades: [] as any,
+    });
+    jest.spyOn(nexoPro, 'getOrderDetails').mockReturnValueOnce({
+      id: 'details-id',
+      trades: ['fake-trade-1', 'fake-trade-2', 'fake-trade-3'] as any,
+    });
+    jest.spyOn(NexoProModule, 'default').mockReturnValueOnce(nexoPro as any);
+
+    const nexo = Nexo(KEY, SECRET);
+
+    const order = await nexo.buy({ pair: 'BTC/USD', ammount: 1000 });
+    expect(nexoPro.getOrderDetails).toBeCalledTimes(3);
+    expect(nexoPro.getOrderDetails).toBeCalledWith({
+      id: 'order-id',
+    });
+    expect(order).toStrictEqual({
+      id: 'details-id',
+      trades: ['fake-trade-1', 'fake-trade-2', 'fake-trade-3'],
+    });
   });
 });
