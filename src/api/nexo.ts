@@ -6,6 +6,8 @@ import {
   SpecificOrderResponse,
 } from 'nexo-pro/lib/types/client';
 
+const ORDER_DETAILS_TRY = 3;
+
 export const Nexo = (key: string, secret: string) => {
   const client = Client({
     api_key: key,
@@ -13,21 +15,28 @@ export const Nexo = (key: string, secret: string) => {
   });
 
   const getOrderDetails = async (
-    orderId: string
-  ): Promise<SpecificOrderResponse> => {
+    orderId: string,
+    retry: number
+  ): Promise<SpecificOrderResponse | undefined> => {
+    if (retry === 0) return undefined;
+
     const orderDetails = await client.getOrderDetails({
       id: orderId,
     });
 
     if (orderDetails.trades.length === 0) {
+      logDebug('order details not available, retry');
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return await getOrderDetails(orderId);
+      return await getOrderDetails(orderId, retry - 1);
     }
 
     return orderDetails;
   };
 
-  const buy = async ({ pair, ammount }: BuyParams) => {
+  const buy = async ({
+    pair,
+    ammount,
+  }: BuyParams): Promise<SpecificOrderResponse> => {
     const quoteResponse: QuoteResponse = await client.getQuote({
       pair: pair,
       amount: ammount,
@@ -49,11 +58,25 @@ export const Nexo = (key: string, secret: string) => {
 
     logDebug(orderResponse);
 
-    let orderDetails = await getOrderDetails(orderResponse.orderId);
+    let orderDetails = await getOrderDetails(
+      orderResponse.orderId,
+      ORDER_DETAILS_TRY
+    );
 
     logDebug(orderDetails);
 
-    return orderDetails;
+    return orderDetails
+      ? orderDetails
+      : {
+          id: orderResponse.orderId,
+          exchangeRate: quoteResponse.price,
+          executedQuantity: amountOut,
+          pair,
+          side: 'buy',
+          quantity: amountOut,
+          timestamp: new Date().getTime(),
+          trades: [],
+        };
   };
 
   return { buy };

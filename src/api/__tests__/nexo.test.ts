@@ -86,4 +86,40 @@ describe('Nexo API', () => {
       trades: ['fake-trade-1', 'fake-trade-2', 'fake-trade-3'],
     });
   });
+
+  it('should return a default constructed trade after 3 failed getOrderDetails', async () => {
+    const nexoPro = mockNexoPro();
+    jest.spyOn(nexoPro, 'getOrderDetails').mockReturnValueOnce({
+      id: 'details-id',
+      trades: [] as any,
+    });
+    jest.spyOn(nexoPro, 'getOrderDetails').mockReturnValueOnce({
+      id: 'details-id',
+      trades: [] as any,
+    });
+    jest.spyOn(nexoPro, 'getOrderDetails').mockReturnValueOnce({
+      id: 'details-id',
+      trades: [] as any,
+    });
+    jest.spyOn(NexoProModule, 'default').mockReturnValueOnce(nexoPro as any);
+
+    const nexo = Nexo(KEY, SECRET);
+
+    const order = await nexo.buy({ pair: 'BTC/USD', ammount: 1000 });
+    expect(nexoPro.getOrderDetails).toBeCalledTimes(3);
+    expect(nexoPro.getOrderDetails).toBeCalledWith({
+      id: 'order-id',
+    });
+    expect(order).toEqual(
+      expect.objectContaining({
+        id: 'order-id',
+        side: 'buy',
+        pair: 'BTC/USD',
+        exchangeRate: 30400,
+        executedQuantity: 0.03289473684210526,
+        quantity: 0.03289473684210526,
+        trades: [],
+      })
+    );
+  });
 });
