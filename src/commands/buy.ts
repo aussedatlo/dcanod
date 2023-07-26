@@ -4,6 +4,7 @@ import { Options } from '@app/types/app';
 import { Config } from '@app/types/config';
 import { getCryptoNameBySymbol } from '@app/utils/coingecko';
 import { readConfig } from '@app/utils/config';
+import { getUsdPriceFromSymbol } from '@app/utils/jsdelivr';
 import { logDebug, logOk, setDebug } from '@app/utils/logger';
 import ghostfolioApi from 'ghostfolio-api';
 import { ImportRequestBody } from 'ghostfolio-api/lib/types';
@@ -35,16 +36,20 @@ const buy = async (
     ammount,
   });
 
+  const price: number =
+    (await getUsdPriceFromSymbol(asset2.toLowerCase())) || 1;
+
   const order: ImportRequestBody = {
     activities: [
       {
-        currency: asset2,
+        currency: 'USD',
         symbol: (await getCryptoNameBySymbol(asset1)) || '',
         fee: 0,
         type: orderResponse.side.toUpperCase(),
         date: new Date(orderResponse.timestamp * 1000).toISOString(),
         quantity: Number(orderResponse.executedQuantity),
-        unitPrice: Number(orderResponse.exchangeRate),
+        unitPrice: Number(orderResponse.exchangeRate) * price,
+        dataSource: 'COINGECKO',
       },
     ],
   };
