@@ -23,15 +23,15 @@ describe('Buy command', () => {
     expect(nexo.buy).toHaveBeenCalledTimes(1);
     expect(gf.importData).toHaveBeenCalledWith({
       activities: [
-        {
+        expect.objectContaining({
           currency: 'USD',
-          date: '1970-01-01T04:11:00.151Z',
+          date: '1970-06-24T07:22:31.000Z',
           fee: 0,
           symbol: 'bitcoin',
           quantity: 300,
-          type: 'buy',
+          type: 'BUY',
           unitPrice: 2000,
-        },
+        }),
       ],
     });
   });

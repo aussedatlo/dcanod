@@ -8,9 +8,9 @@ const buyMock = jest.fn(({ pair, amount }): Promise<SpecificOrderResponse> => {
       side: 'buy',
       pair: 'BTC/USD',
       timestamp: 15060151,
-      quantity: 50000,
-      exchangeRate: 2000,
-      executedQuantity: 300,
+      quantity: '50000',
+      exchangeRate: '2000',
+      executedQuantity: '300',
       trades: [],
     })
   );

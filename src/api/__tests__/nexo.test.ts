@@ -115,9 +115,9 @@ describe('Nexo API', () => {
         id: 'order-id',
         side: 'buy',
         pair: 'BTC/USD',
-        exchangeRate: 30400,
-        executedQuantity: 0.03289473684210526,
-        quantity: 0.03289473684210526,
+        exchangeRate: '30400',
+        executedQuantity: '0.03289473684210526',
+        quantity: '0.03289473684210526',
         trades: [],
       })
     );
