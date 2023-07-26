@@ -69,12 +69,12 @@ export const Nexo = (key: string, secret: string) => {
       ? orderDetails
       : {
           id: orderResponse.orderId,
-          exchangeRate: quoteResponse.price,
-          executedQuantity: amountOut,
+          exchangeRate: quoteResponse.price.toString(),
+          executedQuantity: amountOut.toString(),
           pair,
           side: 'buy',
-          quantity: amountOut,
-          timestamp: new Date().getTime(),
+          quantity: amountOut.toString(),
+          timestamp: new Date().getTime() / 1000,
           trades: [],
         };
   };
