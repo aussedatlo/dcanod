@@ -40,12 +40,12 @@ dcanod-cli setup
 ```
 
 ```shell
-✔ Api key:  … <nexo-api-key>
-✔ Api secret:  … <nexo-api-secret>
-✔ Ghostfolio hostname:  … <ghostfolio-hostname>
-✔ Ghostfolio port:  … <ghostfolio-port>
-✔ Ghostfolio secret:  … <ghostfolio-secret-token>
-✔ Ghostfolio account id (optionnal):  … <account-id>
+✔ [Nexo] key:  … <nexo-api-key>
+✔ [Nexo] secret:  … <nexo-api-secret>
+✔ [Ghostfolio] hostname:  … <ghostfolio-hostname>
+✔ [Ghostfolio] port:  … <ghostfolio-port>
+✔ [Ghostfolio] secret:  … <ghostfolio-secret-token>
+✔ [Ghostfolio] (optionnal) account id :  … <account-id>
 ✔ Configuration saved
 ```
 

@@ -17,7 +17,7 @@ const setup_cmd = async ({ debug, configFile }: Options) => {
     {
       type: 'text',
       name: 'apiKey',
-      message: 'Api key: ',
+      message: '[Nexo] key: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
           ? `incorrect Api key`
@@ -26,7 +26,7 @@ const setup_cmd = async ({ debug, configFile }: Options) => {
     {
       type: 'password',
       name: 'apiSecret',
-      message: 'Api secret: ',
+      message: '[Nexo] secret: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
           ? 'incorrect Api key'
@@ -35,22 +35,22 @@ const setup_cmd = async ({ debug, configFile }: Options) => {
     {
       type: 'text',
       name: 'gfHostname',
-      message: 'Ghostfolio hostname: ',
+      message: '[Ghostfolio] hostname: ',
     },
     {
       type: 'number',
       name: 'gfPort',
-      message: 'Ghostfolio port: ',
+      message: '[Ghostfolio] port: ',
     },
     {
       type: 'password',
       name: 'gfSecret',
-      message: 'Ghostfolio secret: ',
+      message: '[Ghostfolio] secret: ',
     },
     {
       type: 'text',
       name: 'gfAccountId',
-      message: 'Ghostfolio account id (optionnal): ',
+      message: '[Ghostfolio] (optionnal) account id : ',
     },
   ]);
 
