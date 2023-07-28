@@ -45,6 +45,7 @@ dcanod-cli setup
 ✔ Ghostfolio hostname:  … <ghostfolio-hostname>
 ✔ Ghostfolio port:  … <ghostfolio-port>
 ✔ Ghostfolio secret:  … <ghostfolio-secret-token>
+✔ Ghostfolio account id (optionnal):  … <account-id>
 ✔ Configuration saved
 ```
 
