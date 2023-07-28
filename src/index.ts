@@ -16,7 +16,7 @@ const main = async () => {
     .description(pkg.description)
     .usage('[options] <command>')
     .option('-d, --debug', 'output extra debugging information')
-    .option('-p, --config-path <path>', 'path to the config folder')
+    .option('-c, --config-file <file>', 'path to the config file')
     .enablePositionalOptions(true)
     .addHelpText(
       'beforeAll',
@@ -30,9 +30,9 @@ const main = async () => {
 
   program
     .command('setup')
-    .description('configure dcanod test')
+    .description('configure dcanod')
     .option('-d, --debug', 'output extra debugging information')
-    .option('-p, --config-path <path>', 'path to the config folder')
+    .option('-c, --config-file <file>', 'path to the config file')
     .action((options: Options) => {
       setup_cmd(options);
     });
@@ -43,7 +43,7 @@ const main = async () => {
     .arguments('<ammount>')
     .description('buy <ammount> of crypto using <pair>')
     .option('-d, --debug', 'output extra debugging information')
-    .option('-p, --config-path <path>', 'path to the config folder')
+    .option('-c, --config-file <file>', 'path to the config file')
     .action((pair: string, ammount: number, options: Options) => {
       buy_cmd({ pair, ammount }, options);
     });

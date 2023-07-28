@@ -4,6 +4,7 @@ import { Options } from '@app/types/app';
 import { Config } from '@app/types/config';
 import { getCryptoNameBySymbol } from '@app/utils/coingecko';
 import { readConfig } from '@app/utils/config';
+import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
 import { getUsdPriceFromSymbol } from '@app/utils/jsdelivr';
 import { logDebug, logOk, setDebug } from '@app/utils/logger';
 import ghostfolioApi from 'ghostfolio-api';
@@ -12,25 +13,20 @@ import { SpecificOrderResponse } from 'nexo-pro/lib/types/client';
 
 const buy = async (
   { pair, ammount }: BuyParams,
-  { debug, configPath }: Options
+  { debug, configFile }: Options
 ) => {
-  const config: Config = readConfig(configPath);
-  const {
-    apiKey,
-    apiSecret,
-    gfAccountId,
-    gfHostname,
-    gfPort,
-    gfSecret,
-    configPath: path,
-  } = config;
+  const config: Config = readConfig(configFile || DEFAULT_CONFIG_FILE);
   const [asset1, asset2] = pair.split('/');
   if (debug) setDebug();
 
-  logDebug(`using path ${path}`);
+  logDebug(`using file ${configFile || DEFAULT_CONFIG_FILE}`);
 
-  let nexo = Nexo(apiKey, apiSecret);
-  let gf = ghostfolioApi(gfSecret, gfHostname, Number(gfPort));
+  let nexo = Nexo(config.nexo.key, config.nexo.secret);
+  let gf = ghostfolioApi(
+    config.ghostfolio.secret,
+    config.ghostfolio.hostname,
+    Number(config.ghostfolio.port)
+  );
 
   const orderResponse: SpecificOrderResponse = await nexo.buy({
     pair,
@@ -51,7 +47,8 @@ const buy = async (
     dataSource: 'COINGECKO',
   };
 
-  if (gfAccountId) activity.accountId = gfAccountId;
+  if (config.ghostfolio.accountId)
+    activity.accountId = config.ghostfolio.accountId;
 
   logDebug(activity);
 

@@ -15,17 +15,16 @@ jest.mock('../../utils/logger');
 jest.mock('ghostfolio-api');
 
 const CONFIG_WITHOUT_ACCOUNT_ID: Config = {
-  apiKey: 'api-key',
-  apiSecret: 'api-secret',
-  gfHostname: 'gf-hostname',
-  gfPort: 'gf-port',
-  gfSecret: 'gf-secret',
-  configPath: 'config-path',
+  nexo: { key: 'key', secret: 'secret' },
+  ghostfolio: { hostname: 'hostname', port: 'port', secret: 'secret' },
 };
 
 const CONFIG_WITH_ACCOUNT_ID: Config = {
   ...CONFIG_WITHOUT_ACCOUNT_ID,
-  gfAccountId: 'account-id',
+  ghostfolio: {
+    ...CONFIG_WITHOUT_ACCOUNT_ID.ghostfolio,
+    accountId: 'account-id',
+  },
 };
 
 describe('Buy command', () => {
