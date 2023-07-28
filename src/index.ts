@@ -10,6 +10,13 @@ import program from 'commander';
 import figlet from 'figlet';
 
 const main = async () => {
+  const title = chalk.yellowBright(
+    figlet.textSync('DCANod', {
+      horizontalLayout: 'full',
+      verticalLayout: 'full',
+    })
+  );
+
   program
     .name(pkg.name)
     .version(pkg.version)
@@ -18,15 +25,7 @@ const main = async () => {
     .option('-d, --debug', 'output extra debugging information')
     .option('-c, --config-file <file>', 'path to the config file')
     .enablePositionalOptions(true)
-    .addHelpText(
-      'beforeAll',
-      chalk.yellowBright(
-        figlet.textSync('DCANod', {
-          horizontalLayout: 'full',
-          verticalLayout: 'full',
-        })
-      )
-    );
+    .addHelpText('beforeAll', `${title}\nVersion: ${pkg.version}`);
 
   program
     .command('setup')
