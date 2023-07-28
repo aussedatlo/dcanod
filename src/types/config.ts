@@ -1,9 +1,16 @@
 export type Config = {
-  apiKey: string;
-  apiSecret: string;
-  gfAccountId?: string;
-  gfHostname: string;
-  gfPort: string;
-  gfSecret: string;
-  configPath?: string;
+  nexo: NexoConfig;
+  ghostfolio: GhostfolioConfig;
+};
+
+export type GhostfolioConfig = {
+  hostname: string;
+  port: string;
+  secret: string;
+  accountId?: string;
+};
+
+export type NexoConfig = {
+  key: string;
+  secret: string;
 };

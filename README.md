@@ -38,20 +38,22 @@ To configure DCANod to work with Nexo Pro and Ghostfolio, simply execute:
 ```shell
 dcanod-cli setup
 ```
+
 ```shell
-✔ Api key:  … <nexo-api-key>
-✔ Api secret:  … <nexo-api-secret>
-✔ Ghostfolio hostname:  … <ghostfolio-hostname>
-✔ Ghostfolio port:  … <ghostfolio-port>
-✔ Ghostfolio secret:  … <ghostfolio-secret-token>
+✔ [Nexo] key:  … <nexo-api-key>
+✔ [Nexo] secret:  … <nexo-api-secret>
+✔ [Ghostfolio] hostname:  … <ghostfolio-hostname>
+✔ [Ghostfolio] port:  … <ghostfolio-port>
+✔ [Ghostfolio] secret:  … <ghostfolio-secret-token>
+✔ [Ghostfolio] (optionnal) account id :  … <account-id>
 ✔ Configuration saved
 ```
 
 This will create a `config.json` file in `~/.config/dcanod` by default.
-You can use another config folder using option `-p`.
+You can use another config file using option `-c`.
 
 ```shell
-dcanod-cli setup -p /tmp/dcanod
+dcanod-cli setup -c /tmp/dcanod/newconfig.json
 ```
 
 ## Buy command

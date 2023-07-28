@@ -10,29 +10,28 @@ import program from 'commander';
 import figlet from 'figlet';
 
 const main = async () => {
+  const title = chalk.yellowBright(
+    figlet.textSync('DCANod', {
+      horizontalLayout: 'full',
+      verticalLayout: 'full',
+    })
+  );
+
   program
     .name(pkg.name)
     .version(pkg.version)
     .description(pkg.description)
     .usage('[options] <command>')
     .option('-d, --debug', 'output extra debugging information')
-    .option('-p, --config-path <path>', 'path to the config folder')
+    .option('-c, --config-file <file>', 'path to the config file')
     .enablePositionalOptions(true)
-    .addHelpText(
-      'beforeAll',
-      chalk.yellowBright(
-        figlet.textSync('DCANod', {
-          horizontalLayout: 'full',
-          verticalLayout: 'full',
-        })
-      )
-    );
+    .addHelpText('beforeAll', `${title}\nVersion: ${pkg.version}`);
 
   program
     .command('setup')
-    .description('configure dcanod test')
+    .description('configure dcanod')
     .option('-d, --debug', 'output extra debugging information')
-    .option('-p, --config-path <path>', 'path to the config folder')
+    .option('-c, --config-file <file>', 'path to the config file')
     .action((options: Options) => {
       setup_cmd(options);
     });
@@ -43,7 +42,7 @@ const main = async () => {
     .arguments('<ammount>')
     .description('buy <ammount> of crypto using <pair>')
     .option('-d, --debug', 'output extra debugging information')
-    .option('-p, --config-path <path>', 'path to the config folder')
+    .option('-c, --config-file <file>', 'path to the config file')
     .action((pair: string, ammount: number, options: Options) => {
       buy_cmd({ pair, ammount }, options);
     });

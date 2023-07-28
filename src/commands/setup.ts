@@ -1,20 +1,23 @@
 import { Options } from '@app/types/app';
-import { getConfigPath, saveConfig } from '@app/utils/config';
-import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
+import { saveConfig } from '@app/utils/config';
+import {
+  DEFAULT_CONFIG_FILE,
+  KEY_LENGTH_MAX,
+  KEY_LENGTH_MIN,
+} from '@app/utils/constant';
 import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
 import prompts from 'prompts';
 
-const setup_cmd = async ({ debug, configPath }: Options) => {
-  const path = getConfigPath(configPath);
+const setup_cmd = async ({ debug, configFile }: Options) => {
   if (debug) setDebug();
 
-  logDebug(`using path ${path}`);
+  logDebug(`using file ${configFile}`);
 
   const response = await prompts([
     {
       type: 'text',
       name: 'apiKey',
-      message: 'Api key: ',
+      message: '[Nexo] key: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
           ? `incorrect Api key`
@@ -23,7 +26,7 @@ const setup_cmd = async ({ debug, configPath }: Options) => {
     {
       type: 'password',
       name: 'apiSecret',
-      message: 'Api secret: ',
+      message: '[Nexo] secret: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
           ? 'incorrect Api key'
@@ -32,22 +35,22 @@ const setup_cmd = async ({ debug, configPath }: Options) => {
     {
       type: 'text',
       name: 'gfHostname',
-      message: 'Ghostfolio hostname: ',
+      message: '[Ghostfolio] hostname: ',
     },
     {
       type: 'number',
       name: 'gfPort',
-      message: 'Ghostfolio port: ',
+      message: '[Ghostfolio] port: ',
     },
     {
       type: 'password',
       name: 'gfSecret',
-      message: 'Ghostfolio secret: ',
+      message: '[Ghostfolio] secret: ',
     },
     {
       type: 'text',
       name: 'gfAccountId',
-      message: 'Ghostfolio account id (optionnal): ',
+      message: '[Ghostfolio] (optionnal) account id : ',
     },
   ]);
 
@@ -61,7 +64,18 @@ const setup_cmd = async ({ debug, configPath }: Options) => {
     logErr('incorrect setup');
   }
 
-  saveConfig(response, configPath);
+  saveConfig(
+    {
+      nexo: { key: response.apiKey, secret: response.apiSecret },
+      ghostfolio: {
+        hostname: response.gfHostname,
+        port: response.gfPort,
+        secret: response.gfSecret,
+        accountId: response.gfAccountId,
+      },
+    },
+    configFile || DEFAULT_CONFIG_FILE
+  );
   logOk('Configuration saved');
 };
 
