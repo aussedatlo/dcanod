@@ -13,10 +13,21 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "lib": ["es2021", "dom"],
     "baseUrl": ".",
+    "paths": {
+      "@app/*": ["./src/*"]
+    },
     "outDir": "lib"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/node_modules/*", "coverage", "doc"]
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "coverage",
+    "doc",
+    "**/__mocks__/*",
+    "**/__tests__/*"
+  ]
 }

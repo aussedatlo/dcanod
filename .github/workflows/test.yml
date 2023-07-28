@@ -1,0 +1,19 @@
+name: Lint CI
+
+on:
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
+
+jobs:
+  run-test:
+    name: Run Jest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - run: npm install
+      - run: npm run test

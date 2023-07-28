@@ -1,31 +1,19 @@
-import { createConfigFolder, getConfigPath, saveConfig } from '../utils/config';
-import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '../utils/constant';
-import { init } from '../utils/sqlite';
-import { logDebug, logErr, logOk } from '../utils/utils';
+import { Options } from '@app/types/app';
+import { getConfigPath, saveConfig } from '@app/utils/config';
+import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
+import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
+import prompts from 'prompts';
 
-const prompts = require('prompts');
-const { context } = require('../utils/context');
-
-const setup_cmd = async (options: any) => {
-  const { debug, configPath } = options;
+const setup_cmd = async ({ debug, configPath }: Options) => {
   const path = getConfigPath(configPath);
-  context.debug = debug;
+  if (debug) setDebug();
 
-  logDebug('using path ' + path);
+  logDebug(`using path ${path}`);
 
   const response = await prompts([
     {
-      type: 'select',
-      name: 'platform',
-      message: 'Select your platform: ',
-      choices: [
-        { title: 'Binance', value: 'binance' },
-        { title: 'Nexo Pro', value: 'nexo' },
-      ],
-    },
-    {
       type: 'text',
-      name: 'key',
+      name: 'apiKey',
       message: 'Api key: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
@@ -34,24 +22,46 @@ const setup_cmd = async (options: any) => {
     },
     {
       type: 'password',
-      name: 'secret',
+      name: 'apiSecret',
       message: 'Api secret: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
           ? 'incorrect Api key'
           : true,
     },
+    {
+      type: 'text',
+      name: 'gfHostname',
+      message: 'Ghostfolio hostname: ',
+    },
+    {
+      type: 'number',
+      name: 'gfPort',
+      message: 'Ghostfolio port: ',
+    },
+    {
+      type: 'password',
+      name: 'gfSecret',
+      message: 'Ghostfolio secret: ',
+    },
+    {
+      type: 'text',
+      name: 'gfAccountId',
+      message: 'Ghostfolio account id (optionnal): ',
+    },
   ]);
 
-  if (!response.key || !response.secret || !response.platform) {
+  if (
+    !response.apiKey ||
+    !response.apiKey ||
+    !response.gfHostname ||
+    !response.gfPort ||
+    !response.gfSecret
+  ) {
     logErr('incorrect setup');
   }
 
-  const json_data = JSON.stringify(response);
-
-  createConfigFolder(path);
-  saveConfig(json_data, path);
-  await init(path);
+  saveConfig(response, configPath);
   logOk('Configuration saved');
 };
 

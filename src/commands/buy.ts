@@ -1,45 +1,72 @@
-import { createOrder, init } from '../utils/sqlite';
-import Api, { IOrder } from '../api/api';
-import { getApi } from '../api/utils';
-import { getConfigPath, IConfig, readConfig } from '../utils/config';
-import { logDebug, logErr, logOk } from '../utils/utils';
+import { Nexo } from '@app/api/nexo';
+import { BuyParams } from '@app/types/api';
+import { Options } from '@app/types/app';
+import { Config } from '@app/types/config';
+import { getCryptoNameBySymbol } from '@app/utils/coingecko';
+import { readConfig } from '@app/utils/config';
+import { getUsdPriceFromSymbol } from '@app/utils/jsdelivr';
+import { logDebug, logOk, setDebug } from '@app/utils/logger';
+import ghostfolioApi from 'ghostfolio-api';
+import { Activity } from 'ghostfolio-api/lib/types';
+import { SpecificOrderResponse } from 'nexo-pro/lib/types/client';
 
-const { context } = require('../utils/context');
+const buy = async (
+  { pair, ammount }: BuyParams,
+  { debug, configPath }: Options
+) => {
+  const config: Config = readConfig(configPath);
+  const {
+    apiKey,
+    apiSecret,
+    gfAccountId,
+    gfHostname,
+    gfPort,
+    gfSecret,
+    configPath: path,
+  } = config;
+  const [asset1, asset2] = pair.split('/');
+  if (debug) setDebug();
 
-export interface Params {
-  readonly pair: string;
-  readonly ammount: number;
-  readonly options: any;
-}
+  logDebug(`using path ${path}`);
 
-const buy = async ({ pair, ammount, options }: Params) => {
-  const { debug, configPath } = options;
-  const path = getConfigPath(configPath);
-  const config: IConfig = readConfig(path);
-  const { platform, key, secret } = config;
-  context.debug = debug;
-  await init(path);
+  let nexo = Nexo(apiKey, apiSecret);
+  let gf = ghostfolioApi(gfSecret, gfHostname, Number(gfPort));
 
-  logDebug('using path ' + path);
+  const orderResponse: SpecificOrderResponse = await nexo.buy({
+    pair,
+    ammount,
+  });
 
-  let api: Api | undefined = getApi(platform, key, secret);
+  const price: number =
+    (await getUsdPriceFromSymbol(asset2.toLowerCase())) || 1;
 
-  if (api) {
-    const order: IOrder = await api.buy({ pair, ammount });
+  const activity: Activity = {
+    currency: 'USD',
+    symbol: (await getCryptoNameBySymbol(asset1)) || '',
+    fee: 0,
+    type: orderResponse.side.toUpperCase(),
+    date: new Date(orderResponse.timestamp * 1000).toISOString(),
+    quantity: Number(orderResponse.executedQuantity),
+    unitPrice: Number(orderResponse.exchangeRate) * price,
+    dataSource: 'COINGECKO',
+  };
 
-    logOk(
-      'order created: ' +
-        pair +
-        ', quantity: ' +
-        parseFloat(order.quantity.toString()) +
-        ', price: ' +
-        parseFloat(order.price.toString())
-    );
+  if (gfAccountId) activity.accountId = gfAccountId;
 
-    createOrder(path, order);
-  } else {
-    logErr('no compatible api found');
-  }
+  logDebug(activity);
+
+  logOk(
+    'order created: ' +
+      pair +
+      ', quantity: ' +
+      parseFloat(orderResponse.executedQuantity.toString()) +
+      ', price: ' +
+      parseFloat(orderResponse.exchangeRate.toString())
+  );
+
+  gf.importData({
+    activities: [activity],
+  });
 };
 
 export default buy;

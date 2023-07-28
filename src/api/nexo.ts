@@ -1,21 +1,43 @@
-import { Client } from 'nexo-pro';
-import { QuoteResponse } from 'nexo-pro/lib/types/client';
-import { logDebug } from '../utils/utils';
-import Api, { BuyParams, IOrder } from './api';
+import { BuyParams } from '@app/types/api';
+import { logDebug } from '@app/utils/logger';
+import Client from 'nexo-pro';
+import {
+  QuoteResponse,
+  SpecificOrderResponse,
+} from 'nexo-pro/lib/types/client';
 
-export class Nexo extends Api {
-  private client: Client;
+const ORDER_DETAILS_TRY = 3;
 
-  constructor(key: string, secret: string) {
-    super(key, secret);
-    this.client = new Client({
-      api_key: this.key,
-      api_secret: this.secret,
+export const Nexo = (key: string, secret: string) => {
+  const client = Client({
+    api_key: key,
+    api_secret: secret,
+  });
+
+  const getOrderDetails = async (
+    orderId: string,
+    retry: number
+  ): Promise<SpecificOrderResponse | undefined> => {
+    if (retry === 0) return undefined;
+
+    const orderDetails = await client.getOrderDetails({
+      id: orderId,
     });
-  }
 
-  buy = async ({ pair, ammount }: BuyParams) => {
-    const quoteResponse: QuoteResponse = await this.client.getQuote({
+    if (orderDetails.trades.length === 0) {
+      logDebug('order details not available, retry');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return await getOrderDetails(orderId, retry - 1);
+    }
+
+    return orderDetails;
+  };
+
+  const buy = async ({
+    pair,
+    ammount,
+  }: BuyParams): Promise<SpecificOrderResponse> => {
+    const quoteResponse: QuoteResponse = await client.getQuote({
       pair: pair,
       amount: ammount,
       side: 'buy',
@@ -27,36 +49,35 @@ export class Nexo extends Api {
 
     logDebug(`amount to buy: ${amountOut}`);
 
-    const id = await this.client.placeOrder({
+    const orderResponse = await client.placeOrder({
       pair: pair,
       side: 'buy',
       type: 'market',
       quantity: amountOut,
     });
 
-    logDebug(id);
+    logDebug(orderResponse);
 
-    const order: IOrder = {
-      pair: pair,
-      id: id.orderId,
-      time: Date.now(),
-      price: quoteResponse.price,
-      quantity: amountOut,
-    };
+    let orderDetails = await getOrderDetails(
+      orderResponse.orderId,
+      ORDER_DETAILS_TRY
+    );
 
-    return order;
+    logDebug(orderDetails);
+
+    return orderDetails
+      ? orderDetails
+      : {
+          id: orderResponse.orderId,
+          exchangeRate: quoteResponse.price.toString(),
+          executedQuantity: amountOut.toString(),
+          pair,
+          side: 'buy',
+          quantity: amountOut.toString(),
+          timestamp: new Date().getTime() / 1000,
+          trades: [],
+        };
   };
 
-  price = async (pair: string) => {
-    const res: QuoteResponse = await this.client.getQuote({
-      pair: pair,
-      amount: 1,
-      side: 'buy',
-    });
-    return res.price;
-  };
-
-  assets = (pair: string) => {
-    return { asset1: pair.split('/')[0], asset2: pair.split('/')[1] };
-  };
-}
+  return { buy };
+};

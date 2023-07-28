@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 
-const { context } = require('./context');
+let debug = false;
 
 export const logDebug = (s: any) => {
-  if (context.debug) console.log(s);
+  if (debug) console.log(s);
 };
 
 export const logErr = (s: any) => {
@@ -13,4 +13,8 @@ export const logErr = (s: any) => {
 
 export const logOk = (s: any) => {
   console.log(chalk.green('✔ ') + s);
+};
+
+export const setDebug = () => {
+  debug = true;
 };
