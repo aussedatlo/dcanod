@@ -44,6 +44,11 @@ const setup_cmd = async ({ debug, configPath }: Options) => {
       name: 'gfSecret',
       message: 'Ghostfolio secret: ',
     },
+    {
+      type: 'text',
+      name: 'gfAccountId',
+      message: 'Ghostfolio account id (optionnal): ',
+    },
   ]);
 
   if (

@@ -7,7 +7,7 @@ import { readConfig } from '@app/utils/config';
 import { getUsdPriceFromSymbol } from '@app/utils/jsdelivr';
 import { logDebug, logOk, setDebug } from '@app/utils/logger';
 import ghostfolioApi from 'ghostfolio-api';
-import { ImportRequestBody } from 'ghostfolio-api/lib/types';
+import { Activity } from 'ghostfolio-api/lib/types';
 import { SpecificOrderResponse } from 'nexo-pro/lib/types/client';
 
 const buy = async (
@@ -18,6 +18,7 @@ const buy = async (
   const {
     apiKey,
     apiSecret,
+    gfAccountId,
     gfHostname,
     gfPort,
     gfSecret,
@@ -39,22 +40,20 @@ const buy = async (
   const price: number =
     (await getUsdPriceFromSymbol(asset2.toLowerCase())) || 1;
 
-  const order: ImportRequestBody = {
-    activities: [
-      {
-        currency: 'USD',
-        symbol: (await getCryptoNameBySymbol(asset1)) || '',
-        fee: 0,
-        type: orderResponse.side.toUpperCase(),
-        date: new Date(orderResponse.timestamp * 1000).toISOString(),
-        quantity: Number(orderResponse.executedQuantity),
-        unitPrice: Number(orderResponse.exchangeRate) * price,
-        dataSource: 'COINGECKO',
-      },
-    ],
+  const activity: Activity = {
+    currency: 'USD',
+    symbol: (await getCryptoNameBySymbol(asset1)) || '',
+    fee: 0,
+    type: orderResponse.side.toUpperCase(),
+    date: new Date(orderResponse.timestamp * 1000).toISOString(),
+    quantity: Number(orderResponse.executedQuantity),
+    unitPrice: Number(orderResponse.exchangeRate) * price,
+    dataSource: 'COINGECKO',
   };
 
-  logDebug(order);
+  if (gfAccountId) activity.accountId = gfAccountId;
+
+  logDebug(activity);
 
   logOk(
     'order created: ' +
@@ -65,7 +64,9 @@ const buy = async (
       parseFloat(orderResponse.exchangeRate.toString())
   );
 
-  gf.importData(order);
+  gf.importData({
+    activities: [activity],
+  });
 };
 
 export default buy;
