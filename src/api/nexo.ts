@@ -33,6 +33,10 @@ export const Nexo = (key: string, secret: string) => {
     return orderDetails;
   };
 
+  const order = async (id: string) => {
+    return await getOrderDetails(id, ORDER_DETAILS_TRY);
+  };
+
   const buy = async ({
     pair,
     ammount,
@@ -79,5 +83,5 @@ export const Nexo = (key: string, secret: string) => {
         };
   };
 
-  return { buy };
+  return { buy, order };
 };

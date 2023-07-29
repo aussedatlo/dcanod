@@ -3,6 +3,10 @@ export type BuyParams = {
   ammount: number;
 };
 
+export type LoadParams = {
+  id: string;
+};
+
 export type OrderResult = {
   pair: string;
   id: number | string;
