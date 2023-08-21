@@ -1,5 +1,5 @@
 import { BuyParams } from '@app/types/api';
-import { logDebug } from '@app/utils/logger';
+import { logDebug, logErr } from '@app/utils/logger';
 import Client from 'nexo-pro';
 import {
   QuoteResponse,
@@ -20,17 +20,22 @@ export const Nexo = (key: string, secret: string) => {
   ): Promise<SpecificOrderResponse | undefined> => {
     if (retry === 0) return undefined;
 
-    const orderDetails = await client.getOrderDetails({
-      id: orderId,
-    });
+    try {
+      const orderDetails = await client.getOrderDetails({
+        id: orderId,
+      });
 
-    if (orderDetails.trades.length === 0) {
-      logDebug('order details not available, retry');
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (orderDetails.trades.length === 0) {
+        logDebug('order details not available, retry');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return await getOrderDetails(orderId, retry - 1);
+      }
+
+      return orderDetails;
+    } catch (e) {
+      logErr('order details not available, retry');
       return await getOrderDetails(orderId, retry - 1);
     }
-
-    return orderDetails;
   };
 
   const order = async (id: string) => {
