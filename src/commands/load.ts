@@ -8,7 +8,7 @@ import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
 import { getUsdPriceFromSymbol } from '@app/utils/jsdelivr';
 import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
 import ghostfolioApi from 'ghostfolio-api';
-import { Activity } from 'ghostfolio-api/lib/types';
+import { ActivityImport } from 'ghostfolio-api/lib/types';
 
 const load = async ({ id }: LoadParams, { debug, configFile }: Options) => {
   const config: Config = readConfig(configFile || DEFAULT_CONFIG_FILE);
@@ -35,11 +35,11 @@ const load = async ({ id }: LoadParams, { debug, configFile }: Options) => {
   const price: number =
     (await getUsdPriceFromSymbol(asset2.toLowerCase())) || 1;
 
-  const activity: Activity = {
+  const activity: ActivityImport = {
     currency: 'USD',
     symbol: (await getCryptoNameBySymbol(asset1)) || '',
     fee: 0,
-    type: order.side.toUpperCase(),
+    type: order.side.toUpperCase() === 'BUY' ? 'BUY' : 'SELL',
     date: new Date(order.timestamp * 1000).toISOString(),
     quantity: Number(order.executedQuantity),
     unitPrice: Number(order.exchangeRate) * price,
