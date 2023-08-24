@@ -29,7 +29,7 @@ const CONFIG_WITH_ACCOUNT_ID: Config = {
 
 describe('Load command', () => {
   const nexo = mockNexo();
-  const gf = mockGhostfolioApi();
+  const gf = mockGhostfolioApi({ activities: [] });
 
   jest.spyOn(LoggerModule, 'logOk').mockReturnValue(jest.fn() as any);
   jest.spyOn(NexoModule, 'Nexo').mockReturnValue(nexo);
