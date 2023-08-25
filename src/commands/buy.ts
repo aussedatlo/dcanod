@@ -1,5 +1,4 @@
 import { Nexo } from '@app/api/nexo';
-import load from '@app/commands/load';
 import { BuyParams } from '@app/types/api';
 import { Options } from '@app/types/app';
 import { Config } from '@app/types/config';
@@ -24,7 +23,7 @@ const buy = async (
     ammount,
   });
 
-  await load({ id: orderResponse.id }, { debug, configFile });
+  logDebug(orderResponse);
 };
 
 export default buy;

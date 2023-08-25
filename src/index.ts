@@ -2,7 +2,6 @@
 
 import pkg from '@app/../package.json';
 import buy_cmd from '@app/commands/buy';
-import load_cmd from '@app/commands/load';
 import setup_cmd from '@app/commands/setup';
 import sync_cmd from '@app/commands/sync';
 import { Options } from '@app/types/app';
@@ -47,16 +46,6 @@ const main = async () => {
     .option('-c, --config-file <file>', 'path to the config file')
     .action((pair: string, ammount: number, options: Options) => {
       buy_cmd({ pair, ammount }, options);
-    });
-
-  program
-    .command('load')
-    .arguments('<id>')
-    .description('load <id> order from Nexo to Ghostfolio')
-    .option('-d, --debug', 'output extra debugging information')
-    .option('-c, --config-file <file>', 'path to the config file')
-    .action((id: string, options: Options) => {
-      load_cmd({ id }, options);
     });
 
   program
