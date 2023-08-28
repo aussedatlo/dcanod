@@ -1,7 +1,7 @@
 import * as GhostfolioApiModule from 'ghostfolio-api';
 import { Activities, Activity, ActivityImport } from 'ghostfolio-api/lib/types';
 import { Order } from 'nexo-pro/lib/types/client';
-import { mockGhostfolioApi } from '../../utils/__mocks__/ghostfolio.mock';
+import { mockGhostfolioApi } from '../../__mocks__/ghostfolio.mock';
 import * as CoingeckoModule from '../../utils/coingecko';
 import * as ConfigModule from '../../utils/config';
 import * as JsdelivrModule from '../../utils/jsdelivr';
