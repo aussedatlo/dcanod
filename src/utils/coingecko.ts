@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logDebug, logErr } from './logger';
+import { logDebug } from './logger';
 
 export const getCryptoNameBySymbol = async (
   symbol: string
@@ -14,7 +14,7 @@ export const getCryptoNameBySymbol = async (
       }
     );
 
-    return response.data?.coins.filter((coin) => coin.symbol === symbol)[0].id;
+    return response.data.coins.filter((coin) => coin.symbol === symbol)[0].id;
   } catch (error) {
     logDebug(error);
     logDebug('Error fetching cryptocurrency data');
