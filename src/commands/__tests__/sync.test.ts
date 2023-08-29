@@ -3,6 +3,7 @@ import { Activities, Activity, ActivityImport } from 'ghostfolio-api/lib/types';
 import * as NexoProModule from 'nexo-pro';
 import { Order } from 'nexo-pro/lib/types/client';
 import { mockGhostfolioApi } from '../../__mocks__/ghostfolio.mock';
+import { mockLogger } from '../../__mocks__/logger.mock';
 import { mockNexoPro } from '../../__mocks__/nexo-pro.mock';
 import * as CoingeckoModule from '../../utils/coingecko';
 import * as ConfigModule from '../../utils/config';
@@ -70,19 +71,8 @@ describe('Buy command', () => {
 
   const activities: Activities = { activities: [] };
   let gfMock = mockGhostfolioApi(activities);
-
-  jest.spyOn(LoggerModule, 'logOk');
-  jest.spyOn(LoggerModule, 'logErr');
-  jest.spyOn(LoggerModule, 'logDebug');
-  jest.spyOn(LoggerModule, 'setDebug');
-  const logMock = jest.fn(() => {});
-  const setDebugMock = jest.fn(() => {});
-  jest.mocked(LoggerModule.logErr).mockImplementation(logMock);
-  jest.mocked(LoggerModule.logOk).mockImplementation(logMock);
-  jest.mocked(LoggerModule.logDebug).mockImplementation(logMock);
-  jest.spyOn(LoggerModule, 'setDebug').mockImplementation(setDebugMock);
-
   const nexoProMock = mockNexoPro();
+  const loggerMock = mockLogger();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -100,6 +90,11 @@ describe('Buy command', () => {
       ghostfolio: { hostname: '', port: '', secret: '' },
     });
 
+    jest.mocked(LoggerModule.logDebug).mockImplementation(loggerMock.logDebug);
+    jest.mocked(LoggerModule.logErr).mockImplementation(loggerMock.logErr);
+    jest.mocked(LoggerModule.logOk).mockImplementation(loggerMock.logOk);
+    jest.mocked(LoggerModule.setDebug).mockImplementation(loggerMock.setDebug);
+
     nexoProMock.getOrders.mockResolvedValue({ orders });
   });
 
@@ -109,35 +104,36 @@ describe('Buy command', () => {
       .mockResolvedValue(undefined);
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledTimes(2);
-    expect(logMock).toBeCalledWith('unable to get name for symbol BTC');
+    expect(loggerMock.logErr).toBeCalledTimes(1);
+    expect(loggerMock.logErr).toBeCalledWith(
+      'unable to get name for symbol BTC'
+    );
   });
 
   it('should display an error when orders is undefined', async () => {
     nexoProMock.getOrders.mockRejectedValue(undefined);
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledTimes(2);
-    expect(logMock).toBeCalledWith('unable to fetch orders');
+    expect(loggerMock.logErr).toBeCalledTimes(1);
+    expect(loggerMock.logErr).toBeCalledWith('unable to fetch orders');
   });
 
   it('should work when no orders', async () => {
     nexoProMock.getOrders.mockResolvedValue({ orders: [] });
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledTimes(2);
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logOk).toBeCalledTimes(1);
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
   });
 
-  it('should return an error when price is not available', async () => {
+  it('should return two errors when price is not available', async () => {
     jest
       .spyOn(JsdelivrModule, 'getUsdPriceFromSymbol')
       .mockResolvedValue(undefined);
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledTimes(4);
-    expect(logMock).toBeCalledWith('unable to get price of EUR');
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logErr).toBeCalledTimes(2);
+    expect(loggerMock.logOk).toBeCalledTimes(1);
     expect(gfMock.importData).not.toBeCalled();
   });
 
@@ -147,8 +143,8 @@ describe('Buy command', () => {
       .mockResolvedValueOnce(undefined);
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledWith('unable to get price of EUR');
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logErr).toBeCalledTimes(1);
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
     expect(gfMock.importData).toBeCalledTimes(1);
     expect(gfMock.importData).toBeCalledWith({
       activities: [ActivitiesImport[1]],
@@ -158,7 +154,7 @@ describe('Buy command', () => {
   it('should import all orders correctly', async () => {
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
     expect(gfMock.importData).toBeCalledTimes(2);
     expect(gfMock.importData).toBeCalledWith({
       activities: [ActivitiesImport[0]],
@@ -181,7 +177,7 @@ describe('Buy command', () => {
 
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
     expect(gfMock.importData).toBeCalledTimes(2);
     expect(gfMock.importData).toBeCalledWith({
       activities: [{ ...ActivitiesImport[0], accountId: 'account-id' }],
@@ -199,12 +195,14 @@ describe('Buy command', () => {
 
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
     expect(gfMock.importData).toBeCalledTimes(1);
     expect(gfMock.importData).toBeCalledWith({
       activities: [ActivitiesImport[0]],
     });
-    expect(logMock).toBeCalledWith(`order ${orders[1].id} already synced`);
+    expect(loggerMock.logDebug).toBeCalledWith(
+      `order ${orders[1].id} already synced`
+    );
 
     gfMock = mockGhostfolioApi({
       activities: [{ comment: 'id-1' } as unknown as Activity],
@@ -213,12 +211,14 @@ describe('Buy command', () => {
 
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledWith('sync done');
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
     expect(gfMock.importData).toBeCalledTimes(1);
     expect(gfMock.importData).toBeCalledWith({
       activities: [ActivitiesImport[1]],
     });
-    expect(logMock).toBeCalledWith(`order ${orders[0].id} already synced`);
+    expect(loggerMock.logDebug).toBeCalledWith(
+      `order ${orders[0].id} already synced`
+    );
   });
 
   it('should skip import if nexo order is invalid', async () => {
@@ -227,8 +227,10 @@ describe('Buy command', () => {
     });
     await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(logMock).toBeCalledWith('sync done');
-    expect(logMock).toBeCalledWith(`order ${orders[1].id} is invalid`);
+    expect(loggerMock.logOk).toBeCalledWith('sync done');
+    expect(loggerMock.logDebug).toBeCalledWith(
+      `order ${orders[1].id} is invalid`
+    );
     expect(gfMock.importData).toBeCalledTimes(0);
   });
 
@@ -251,16 +253,18 @@ describe('Buy command', () => {
     await sync({ pair: 'BTC/EUR' }, {});
 
     expect(gfMock.importData).toBeCalledTimes(0);
-    expect(logMock).toBeCalledWith(`unable to import ${orders[1].id}`);
+    expect(loggerMock.logErr).toBeCalledWith(
+      `unable to import ${orders[1].id}`
+    );
   });
 
   it('should not print debug log when not activated', async () => {
     nexoProMock.getOrders.mockResolvedValue({ orders: [] });
     await sync({ pair: 'BTC/EUR' }, { debug: false });
-    expect(setDebugMock).toBeCalledTimes(0);
+    expect(loggerMock.setDebug).toBeCalledTimes(0);
     await sync({ pair: 'BTC/EUR' }, {});
-    expect(setDebugMock).toBeCalledTimes(0);
+    expect(loggerMock.setDebug).toBeCalledTimes(0);
     await sync({ pair: 'BTC/EUR' }, { debug: true });
-    expect(setDebugMock).toBeCalledTimes(1);
+    expect(loggerMock.setDebug).toBeCalledTimes(1);
   });
 });

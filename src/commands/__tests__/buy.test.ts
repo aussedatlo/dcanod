@@ -1,4 +1,5 @@
 import * as NexoProModule from 'nexo-pro';
+import { mockLogger } from '../../__mocks__/logger.mock';
 import { mockNexoPro } from '../../__mocks__/nexo-pro.mock';
 import * as ConfigModule from '../../utils/config';
 import * as LoggerModule from '../../utils/logger';
@@ -9,15 +10,11 @@ jest.mock('../../utils/config');
 jest.mock('../../utils/logger');
 
 describe('Buy command', () => {
-  jest.spyOn(LoggerModule, 'logErr');
-  jest.spyOn(LoggerModule, 'logOk');
-  jest.spyOn(LoggerModule, 'setDebug');
-  const logErrMock = jest.fn();
-  const logOkMock = jest.fn();
-  const setDebugMock = jest.fn(() => {});
-  jest.mocked(LoggerModule.logErr).mockImplementation(logErrMock);
-  jest.mocked(LoggerModule.logOk).mockImplementation(logOkMock);
-  jest.mocked(LoggerModule.setDebug).mockImplementation(setDebugMock);
+  const loggerMock = mockLogger();
+  jest.mocked(LoggerModule.logDebug).mockImplementation(loggerMock.logDebug);
+  jest.mocked(LoggerModule.logErr).mockImplementation(loggerMock.logErr);
+  jest.mocked(LoggerModule.logOk).mockImplementation(loggerMock.logOk);
+  jest.mocked(LoggerModule.setDebug).mockImplementation(loggerMock.setDebug);
 
   const nexoProMock = mockNexoPro();
   jest
@@ -65,16 +62,16 @@ describe('Buy command', () => {
     nexoProMock.placeOrder.mockResolvedValue({ orderId: 'order-id' });
     await buy({ pair: 'BTC/USD', ammount: 1000 }, {});
 
-    expect(logOkMock).toHaveBeenCalledTimes(1);
-    expect(logOkMock).toHaveBeenCalledWith('order placed: order-id');
+    expect(loggerMock.logOk).toHaveBeenCalledTimes(1);
+    expect(loggerMock.logOk).toHaveBeenCalledWith('order placed: order-id');
   });
 
   it('should display an error on quote error', async () => {
     nexoProMock.getQuote.mockRejectedValue({});
     await buy({ pair: 'BTC/USD', ammount: 1000 }, {});
 
-    expect(logErrMock).toHaveBeenCalledTimes(1);
-    expect(logErrMock).toHaveBeenCalledWith('unable to quote price');
+    expect(loggerMock.logErr).toHaveBeenCalledTimes(1);
+    expect(loggerMock.logErr).toHaveBeenCalledWith('unable to quote price');
     expect(nexoProMock.placeOrder).toHaveBeenCalledTimes(0);
   });
 
@@ -85,16 +82,16 @@ describe('Buy command', () => {
     });
     await buy({ pair: 'BTC/USD', ammount: 1000 }, {});
 
-    expect(logErrMock).toHaveBeenCalledTimes(1);
-    expect(logErrMock).toHaveBeenCalledWith('unable to place order');
+    expect(loggerMock.logErr).toHaveBeenCalledTimes(1);
+    expect(loggerMock.logErr).toHaveBeenCalledWith('unable to place order');
   });
 
   it('should not print debug log when not activated', async () => {
     await buy({ pair: 'BTC/USD', ammount: 1000 }, { debug: false });
-    expect(setDebugMock).toBeCalledTimes(0);
+    expect(loggerMock.setDebug).toBeCalledTimes(0);
     await buy({ pair: 'BTC/USD', ammount: 1000 }, {});
-    expect(setDebugMock).toBeCalledTimes(0);
+    expect(loggerMock.setDebug).toBeCalledTimes(0);
     await buy({ pair: 'BTC/USD', ammount: 1000 }, { debug: true });
-    expect(setDebugMock).toBeCalledTimes(1);
+    expect(loggerMock.setDebug).toBeCalledTimes(1);
   });
 });
