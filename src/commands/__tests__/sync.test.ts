@@ -70,7 +70,7 @@ describe('Buy command', () => {
   ];
 
   const activities: Activities = { activities: [] };
-  let gfMock = mockGhostfolioApi(activities);
+  const gfMock = mockGhostfolioApi();
   const nexoProMock = mockNexoPro();
   const loggerMock = mockLogger();
 
@@ -83,7 +83,7 @@ describe('Buy command', () => {
     jest
       .spyOn(NexoProModule, 'default')
       .mockImplementation(nexoProMock.client as any);
-    jest.spyOn(GhostfolioApiModule, 'default').mockReturnValue(gfMock);
+    jest.spyOn(GhostfolioApiModule, 'default').mockImplementation(gfMock.gf);
     jest.spyOn(JsdelivrModule, 'getUsdPriceFromSymbol').mockResolvedValue(1.2);
     jest.spyOn(ConfigModule, 'readConfig').mockReturnValue({
       nexo: { key: 'nexo-key', secret: 'nexo-secret' },
@@ -96,6 +96,7 @@ describe('Buy command', () => {
     jest.mocked(LoggerModule.setDebug).mockImplementation(loggerMock.setDebug);
 
     nexoProMock.getOrders.mockResolvedValue({ orders });
+    gfMock.order.mockResolvedValue(activities);
   });
 
   it('should create an api nexo with correct config params', async () => {
@@ -198,10 +199,9 @@ describe('Buy command', () => {
   });
 
   it('should import only if activity is not already present', async () => {
-    gfMock = mockGhostfolioApi({
+    gfMock.order.mockResolvedValue({
       activities: [{ comment: 'id-2' } as unknown as Activity],
     });
-    jest.spyOn(GhostfolioApiModule, 'default').mockReturnValueOnce(gfMock);
 
     await sync({ pair: 'BTC/EUR' }, {});
 
@@ -214,7 +214,9 @@ describe('Buy command', () => {
       `order ${orders[1].id} already synced`
     );
 
-    gfMock = mockGhostfolioApi({
+    gfMock.importData.mockClear();
+
+    gfMock.order.mockResolvedValue({
       activities: [{ comment: 'id-1' } as unknown as Activity],
     });
     jest.spyOn(GhostfolioApiModule, 'default').mockReturnValueOnce(gfMock);
@@ -241,7 +243,10 @@ describe('Buy command', () => {
     expect(loggerMock.logDebug).toBeCalledWith(
       `order ${orders[1].id} is invalid`
     );
-    expect(gfMock.importData).toBeCalledTimes(0);
+    expect(gfMock.importData).toBeCalledTimes(1);
+    expect(gfMock.importData).toBeCalledWith({
+      activities: [ActivitiesImport[0]],
+    });
   });
 
   it('should get usd price with correct date', async () => {
