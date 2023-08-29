@@ -7,6 +7,10 @@ export type LoadParams = {
   id: string;
 };
 
+export type SyncParams = {
+  pair: string;
+};
+
 export type OrderResult = {
   pair: string;
   id: number | string;

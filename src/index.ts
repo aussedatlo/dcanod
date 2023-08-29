@@ -2,8 +2,8 @@
 
 import pkg from '@app/../package.json';
 import buy_cmd from '@app/commands/buy';
-import load_cmd from '@app/commands/load';
 import setup_cmd from '@app/commands/setup';
+import sync_cmd from '@app/commands/sync';
 import { Options } from '@app/types/app';
 import { logErr } from '@app/utils/logger';
 import chalk from 'chalk';
@@ -49,13 +49,13 @@ const main = async () => {
     });
 
   program
-    .command('load')
-    .arguments('<id>')
-    .description('load <id> order from Nexo to Ghostfolio')
+    .command('sync')
+    .arguments('<pair>')
+    .description('sync all <pair> trades to ghostfolio')
     .option('-d, --debug', 'output extra debugging information')
     .option('-c, --config-file <file>', 'path to the config file')
-    .action((id: string, options: Options) => {
-      load_cmd({ id }, options);
+    .action((pair: string, options: Options) => {
+      sync_cmd({ pair }, options);
     });
 
   program.on('command:*', (commands?: string[]) => {

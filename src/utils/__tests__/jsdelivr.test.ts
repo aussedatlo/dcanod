@@ -7,4 +7,8 @@ describe('jsdelivr', () => {
     );
     expect(await getUsdPriceFromSymbol('usd')).toStrictEqual(1);
   });
+
+  it('should return undefined on error', async () => {
+    expect(await getUsdPriceFromSymbol('aaa')).toEqual(undefined);
+  });
 });

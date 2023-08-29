@@ -6,7 +6,7 @@ export const logDebug = (s: any) => {
   if (debug) console.log(s);
 };
 
-export const logErr = (s: any) => {
+export const logErr = (s: any): void => {
   console.log(chalk.red('✖ ') + 'Error: ' + s);
   process.exit(1);
 };
