@@ -1,20 +1,21 @@
 import * as GhostfolioApiModule from 'ghostfolio-api';
 import { Activities, Activity, ActivityImport } from 'ghostfolio-api/lib/types';
+import * as NexoProModule from 'nexo-pro';
 import { Order } from 'nexo-pro/lib/types/client';
 import { mockGhostfolioApi } from '../../__mocks__/ghostfolio.mock';
+import { mockNexoPro } from '../../__mocks__/nexo-pro.mock';
 import * as CoingeckoModule from '../../utils/coingecko';
 import * as ConfigModule from '../../utils/config';
 import * as JsdelivrModule from '../../utils/jsdelivr';
 import * as LoggerModule from '../../utils/logger';
-import * as NexoModule from '../../utils/nexo';
 import sync from '../sync';
 
+jest.mock('ghostfolio-api');
+jest.mock('nexo-pro');
 jest.mock('../../utils/coingecko');
 jest.mock('../../utils/config');
 jest.mock('../../utils/jsdelivr');
 jest.mock('../../utils/logger');
-jest.mock('../../utils/nexo');
-jest.mock('ghostfolio-api');
 
 describe('Buy command', () => {
   const orders: Order[] = [
@@ -81,19 +82,25 @@ describe('Buy command', () => {
   jest.mocked(LoggerModule.logDebug).mockImplementation(logMock);
   jest.spyOn(LoggerModule, 'setDebug').mockImplementation(setDebugMock);
 
+  const nexoProMock = mockNexoPro();
+
   beforeEach(() => {
     jest.clearAllMocks();
 
     jest
       .spyOn(CoingeckoModule, 'getCryptoNameBySymbol')
       .mockResolvedValue('bitcoin');
-    jest.spyOn(NexoModule, 'getOrdersSafely').mockResolvedValue({ orders });
+    jest
+      .spyOn(NexoProModule, 'default')
+      .mockImplementation(nexoProMock.client as any);
     jest.spyOn(GhostfolioApiModule, 'default').mockReturnValue(gfMock);
     jest.spyOn(JsdelivrModule, 'getUsdPriceFromSymbol').mockResolvedValue(1.2);
     jest.spyOn(ConfigModule, 'readConfig').mockReturnValue({
       nexo: { key: '', secret: '' },
       ghostfolio: { hostname: '', port: '', secret: '' },
     });
+
+    nexoProMock.getOrders.mockResolvedValue({ orders });
   });
 
   it('should display an error when symbol is undefined', async () => {
@@ -107,7 +114,7 @@ describe('Buy command', () => {
   });
 
   it('should display an error when orders is undefined', async () => {
-    jest.spyOn(NexoModule, 'getOrdersSafely').mockResolvedValue(undefined);
+    nexoProMock.getOrders.mockRejectedValue(undefined);
     await sync({ pair: 'BTC/EUR' }, {});
 
     expect(logMock).toBeCalledTimes(2);
@@ -115,7 +122,7 @@ describe('Buy command', () => {
   });
 
   it('should work when no orders', async () => {
-    jest.spyOn(NexoModule, 'getOrdersSafely').mockResolvedValue({ orders: [] });
+    nexoProMock.getOrders.mockResolvedValue({ orders: [] });
     await sync({ pair: 'BTC/EUR' }, {});
 
     expect(logMock).toBeCalledTimes(2);
@@ -215,7 +222,7 @@ describe('Buy command', () => {
   });
 
   it('should skip import if nexo order is invalid', async () => {
-    jest.spyOn(NexoModule, 'getOrdersSafely').mockResolvedValue({
+    nexoProMock.getOrders.mockResolvedValue({
       orders: [orders[0], { ...orders[1], executedQuantity: 0 }],
     });
     await sync({ pair: 'BTC/EUR' }, {});
@@ -248,7 +255,7 @@ describe('Buy command', () => {
   });
 
   it('should not print debug log when not activated', async () => {
-    jest.spyOn(NexoModule, 'getOrdersSafely').mockResolvedValue({ orders: [] });
+    nexoProMock.getOrders.mockResolvedValue({ orders: [] });
     await sync({ pair: 'BTC/EUR' }, { debug: false });
     expect(setDebugMock).toBeCalledTimes(0);
     await sync({ pair: 'BTC/EUR' }, {});

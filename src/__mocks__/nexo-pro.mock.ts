@@ -8,12 +8,14 @@ export const mockNexoPro = () => {
   const getQuote = jest.fn();
   const placeOrder = jest.fn();
   const getOrderDetails = jest.fn();
+  const getOrders = jest.fn();
 
   const client = jest.fn(() => ({
     getQuote,
     placeOrder,
     getOrderDetails,
+    getOrders,
   }));
 
-  return { client, getQuote, placeOrder, getOrderDetails };
+  return { client, getQuote, placeOrder, getOrderDetails, getOrders };
 };
