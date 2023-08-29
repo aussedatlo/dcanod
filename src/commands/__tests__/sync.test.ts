@@ -86,7 +86,7 @@ describe('Buy command', () => {
     jest.spyOn(GhostfolioApiModule, 'default').mockReturnValue(gfMock);
     jest.spyOn(JsdelivrModule, 'getUsdPriceFromSymbol').mockResolvedValue(1.2);
     jest.spyOn(ConfigModule, 'readConfig').mockReturnValue({
-      nexo: { key: '', secret: '' },
+      nexo: { key: 'nexo-key', secret: 'nexo-secret' },
       ghostfolio: { hostname: '', port: '', secret: '' },
     });
 
@@ -96,6 +96,16 @@ describe('Buy command', () => {
     jest.mocked(LoggerModule.setDebug).mockImplementation(loggerMock.setDebug);
 
     nexoProMock.getOrders.mockResolvedValue({ orders });
+  });
+
+  it('should create an api nexo with correct config params', async () => {
+    await sync({ pair: 'BTC/USD' }, {});
+
+    expect(nexoProMock.client).toHaveBeenCalledTimes(1);
+    expect(nexoProMock.client).toHaveBeenCalledWith({
+      api_key: 'nexo-key',
+      api_secret: 'nexo-secret',
+    });
   });
 
   it('should display an error when symbol is undefined', async () => {
