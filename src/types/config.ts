@@ -1,5 +1,5 @@
 export type Config = {
-  nexo: NexoConfig;
+  nexo: ExchangeConfig;
   ghostfolio: GhostfolioConfig;
 };
 
@@ -10,7 +10,7 @@ export type GhostfolioConfig = {
   accountId?: string;
 };
 
-export type NexoConfig = {
+export type ExchangeConfig = {
   key: string;
   secret: string;
 };
