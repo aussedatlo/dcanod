@@ -1,19 +1,11 @@
 import ghostfolioApi from 'ghostfolio-api';
-import {
-  Activities,
-  GhostfolioApi,
-  ImportRequestBody,
-} from 'ghostfolio-api/lib/types';
+import { GhostfolioApi, ImportRequestBody } from 'ghostfolio-api/lib/types';
 import { inject, injectable } from 'inversify';
 
 import { IConfigService } from '@app/config/config.service';
+import { IGhostfolio } from '@app/services/ghostfolio/interface';
 import { TYPES } from '@app/types';
 import { GhostfolioConfig } from '@app/types/config';
-
-export interface IGhostfolio {
-  order: () => Promise<Activities>;
-  importData: (requestBody: ImportRequestBody) => Promise<void>;
-}
 
 @injectable()
 class GhostfolioService implements IGhostfolio {
