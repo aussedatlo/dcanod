@@ -2,8 +2,8 @@ import { ActivityImport } from 'ghostfolio-api/lib/types';
 
 import { container } from '@app/container';
 import { ILogger } from '@app/logger/logger.service';
-import { ICryptoResolver } from '@app/services/coingecko.service';
 import { IGhostfolio } from '@app/services/ghostfolio.service';
+import { ICryptoResolver } from '@app/services/interfaces';
 import { IForexResolver } from '@app/services/jsdelivr.service';
 import { IExchangeService } from '@app/services/nexo.service';
 import { TYPES } from '@app/types';

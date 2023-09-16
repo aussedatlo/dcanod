@@ -2,11 +2,8 @@ import axios from 'axios';
 import { inject, injectable } from 'inversify';
 
 import { ILogger } from '@app/logger/logger.service';
+import { ICryptoResolver } from '@app/services/crypto/interface';
 import { TYPES } from '@app/types';
-
-export interface ICryptoResolver {
-  getCryptoNameBySymbol: (name: string) => Promise<string | undefined>;
-}
 
 @injectable()
 class CoingeckoService implements ICryptoResolver {

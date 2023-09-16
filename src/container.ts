@@ -3,9 +3,8 @@ import { Container } from 'inversify';
 import FileCOnfigService, { IConfigService } from '@app/config/config.service';
 import OptionsService, { IAppOptions } from '@app/config/options.service';
 import Logger, { ILogger } from '@app/logger/logger.service';
-import CoingeckoService, {
-  ICryptoResolver,
-} from '@app/services/coingecko.service';
+import { ICryptoResolver } from '@app/services/crypto';
+import CoingeckoService from '@app/services/crypto/coingecko.service';
 import GhostfolioService, {
   IGhostfolio,
 } from '@app/services/ghostfolio.service';
