@@ -10,9 +10,8 @@ import pkg from 'package.json';
 import buy_cmd from '@app/commands/buy';
 import setup_cmd from '@app/commands/setup';
 import sync_cmd from '@app/commands/sync';
-import { container, setupContainer } from '@app/container';
-import { ILogger } from '@app/logger/interface';
-import { TYPES } from '@app/types';
+import unknown_cmd from '@app/commands/unknown';
+import { setupContainer } from '@app/container';
 import { AppOptions } from '@app/types/app';
 
 const main = async () => {
@@ -69,8 +68,7 @@ const main = async () => {
   program.on('command:*', (commands?: string[]) => {
     if (commands) {
       setupContainer({});
-      const logger = container.get<ILogger>(TYPES.LoggerService);
-      logger.error(`unknown command: ${commands[0]}`);
+      unknown_cmd({ command: commands[0] });
     }
   });
 
