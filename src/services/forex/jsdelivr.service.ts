@@ -2,14 +2,8 @@ import axios from 'axios';
 import { inject, injectable } from 'inversify';
 
 import { ILogger } from '@app/logger/logger.service';
+import { IForexResolver } from '@app/services/forex/interface';
 import { TYPES } from '@app/types';
-
-export interface IForexResolver {
-  getUsdPriceFromSymbol: (
-    symbol: string,
-    date?: string
-  ) => Promise<number | undefined>;
-}
 
 @injectable()
 class JsdelivrService implements IForexResolver {
