@@ -8,13 +8,13 @@ import { TYPES } from '@app/types';
 import { Config } from '@app/types/config';
 import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
 
-export interface IConfigService {
+export interface IConfig {
   config: Config;
   saveConfig: (data: Config, file?: string) => void;
 }
 
 @injectable()
-class FileCOnfigService implements IConfigService {
+class FileCOnfigService implements IConfig {
   public config: Config;
   private logger: ILogger;
 

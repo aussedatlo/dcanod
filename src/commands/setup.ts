@@ -1,6 +1,6 @@
 import prompts from 'prompts';
 
-import { IConfigService } from '@app/config/config.service';
+import { IConfig } from '@app/config/config.service';
 import { container } from '@app/container';
 import { ILogger } from '@app/logger/logger.service';
 import { TYPES } from '@app/types';
@@ -8,7 +8,7 @@ import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
 
 const setup_cmd = async () => {
   const logger = container.get<ILogger>(TYPES.LoggerService);
-  const config = container.get<IConfigService>(TYPES.ConfigService);
+  const config = container.get<IConfig>(TYPES.ConfigService);
 
   const response = await prompts([
     {

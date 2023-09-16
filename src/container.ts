@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 
-import FileCOnfigService, { IConfigService } from '@app/config/config.service';
+import FileCOnfigService, { IConfig } from '@app/config/config.service';
 import OptionsService, { IAppOptions } from '@app/config/options.service';
 import Logger, { ILogger } from '@app/logger/logger.service';
 import CoingeckoService from '@app/services/crypto/coingecko.service';
@@ -25,7 +25,7 @@ const setupContainer = (options: AppOptions) => {
 
   container.bind<ILogger>(TYPES.LoggerService).to(Logger);
   container
-    .bind<IConfigService>(TYPES.ConfigService)
+    .bind<IConfig>(TYPES.ConfigService)
     .to(FileCOnfigService)
     .inSingletonScope();
   container
