@@ -58,7 +58,7 @@ dcanod-cli setup -c /tmp/dcanod/newconfig.json
 
 ## Buy command
 
-Buy a specific ammount of crypto.
+Buy a specific amount of crypto.
 
 ```shell
 dcanod-cli buy BTC/USDT 15

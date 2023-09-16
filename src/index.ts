@@ -45,13 +45,13 @@ const main = async () => {
   program
     .command('buy')
     .arguments('<pair>')
-    .arguments('<ammount>')
-    .description('buy <ammount> of crypto using <pair>')
+    .arguments('<amount>')
+    .description('buy <amount> of crypto using <pair>')
     .option('-d, --debug', 'output extra debugging information')
     .option('-c, --config-file <file>', 'path to the config file')
-    .action((pair: string, ammount: number, options: AppOptions) => {
+    .action((pair: string, amount: number, options: AppOptions) => {
       setupContainer(options);
-      buy({ pair, ammount });
+      buy({ pair, amount });
     });
 
   program

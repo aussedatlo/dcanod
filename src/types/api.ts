@@ -1,6 +1,6 @@
 export type BuyParams = {
   pair: string;
-  ammount: number;
+  amount: number;
 };
 
 export type LoadParams = {

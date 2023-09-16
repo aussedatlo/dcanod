@@ -4,13 +4,13 @@ import { IExchange } from '@app/services/interfaces';
 import { TYPES } from '@app/types';
 import { BuyParams } from '@app/types/api';
 
-const buy = async ({ pair, ammount }: BuyParams) => {
+const buy = async ({ pair, amount }: BuyParams) => {
   const logger = container.get<ILogger>(TYPES.LoggerService);
   const exchange = container.get<IExchange>(TYPES.ExchangeService);
 
   const quote = await exchange.getQuote({
     pair: pair,
-    amount: ammount,
+    amount: amount,
     side: 'buy',
   });
 
@@ -21,7 +21,7 @@ const buy = async ({ pair, ammount }: BuyParams) => {
 
   logger.debug(`current price: ${quote.price}`);
 
-  const amountOut = ammount / quote.price;
+  const amountOut = amount / quote.price;
 
   logger.debug(`amount to buy: ${amountOut}`);
 
