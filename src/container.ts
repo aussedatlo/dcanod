@@ -3,15 +3,16 @@ import { Container } from 'inversify';
 import FileCOnfigService, { IConfigService } from '@app/config/config.service';
 import OptionsService, { IAppOptions } from '@app/config/options.service';
 import Logger, { ILogger } from '@app/logger/logger.service';
-import { ICryptoResolver } from '@app/services/crypto';
 import CoingeckoService from '@app/services/crypto/coingecko.service';
-import GhostfolioService, {
-  IGhostfolio,
-} from '@app/services/ghostfolio.service';
-import JsdelivrService, {
+import NexoService from '@app/services/exchange/nexo.service';
+import JsdelivrService from '@app/services/forex/jsdelivr.service';
+import GhostfolioService from '@app/services/ghostfolio/ghostfolio.service';
+import {
+  ICryptoResolver,
+  IExchange,
   IForexResolver,
-} from '@app/services/jsdelivr.service';
-import NexoService, { IExchange } from '@app/services/nexo.service';
+  IGhostfolio,
+} from '@app/services/interfaces';
 import { TYPES } from '@app/types';
 import { AppOptions } from '@app/types/app';
 
