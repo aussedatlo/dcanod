@@ -14,7 +14,7 @@ export interface IConfig {
 }
 
 @injectable()
-class FileCOnfigService implements IConfig {
+class FileConfigService implements IConfig {
   public config: Config;
   private logger: ILogger;
 
@@ -40,4 +40,4 @@ class FileCOnfigService implements IConfig {
   }
 }
 
-export default FileCOnfigService;
+export default FileConfigService;
