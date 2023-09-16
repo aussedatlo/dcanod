@@ -6,7 +6,7 @@ import { ILogger } from '@app/logger/interface';
 import { TYPES } from '@app/types';
 
 @injectable()
-class Logger implements ILogger {
+class BasicLoggerService implements ILogger {
   @inject(TYPES.AppOptions)
   private options: IAppOptions;
 
@@ -17,4 +17,4 @@ class Logger implements ILogger {
   error = (s: string) => console.log(chalk.red('✖ ') + 'Error: ' + s);
 }
 
-export default Logger;
+export default BasicLoggerService;
