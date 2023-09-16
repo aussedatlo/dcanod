@@ -3,8 +3,11 @@ import { ActivityImport } from 'ghostfolio-api/lib/types';
 import { container } from '@app/container';
 import { ILogger } from '@app/logger/logger.service';
 import { IGhostfolio } from '@app/services/ghostfolio.service';
-import { ICryptoResolver, IForexResolver } from '@app/services/interfaces';
-import { IExchangeService } from '@app/services/nexo.service';
+import {
+  ICryptoResolver,
+  IExchangeService,
+  IForexResolver,
+} from '@app/services/interfaces';
 import { TYPES } from '@app/types';
 import { SyncParams } from '@app/types/api';
 

@@ -11,13 +11,8 @@ import {
 } from 'nexo-pro/lib/types/client';
 
 import { IConfigService } from '@app/config/config.service';
+import { IExchangeService } from '@app/services/exchange/interface';
 import { TYPES } from '@app/types';
-
-export interface IExchangeService {
-  getOrders: (params: OrdersParams) => Promise<OrdersResponse | undefined>;
-  getQuote: (params: QuoteParams) => Promise<QuoteResponse | undefined>;
-  placeOrder: (param: OrderParams) => Promise<OrderResponse | undefined>;
-}
 
 @injectable()
 class NexoService implements IExchangeService {

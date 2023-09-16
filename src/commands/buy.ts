@@ -1,6 +1,6 @@
 import { container } from '@app/container';
 import { ILogger } from '@app/logger/logger.service';
-import { IExchangeService } from '@app/services/nexo.service';
+import { IExchangeService } from '@app/services/interfaces';
 import { TYPES } from '@app/types';
 import { BuyParams } from '@app/types/api';
 
