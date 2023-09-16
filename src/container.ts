@@ -2,7 +2,8 @@ import { Container } from 'inversify';
 
 import FileConfigService, { IConfig } from '@app/config/config.service';
 import OptionsService, { IAppOptions } from '@app/config/options.service';
-import Logger, { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
+import Logger from '@app/logger/logger.service';
 import CoingeckoService from '@app/services/crypto/coingecko.service';
 import NexoService from '@app/services/exchange/nexo.service';
 import JsdelivrService from '@app/services/forex/jsdelivr.service';

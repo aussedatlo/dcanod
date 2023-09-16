@@ -1,7 +1,7 @@
 import { ActivityImport } from 'ghostfolio-api/lib/types';
 
 import { container } from '@app/container';
-import { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
 import {
   ICryptoResolver,
   IExchange,

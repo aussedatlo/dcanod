@@ -2,7 +2,7 @@ import prompts from 'prompts';
 
 import { IConfig } from '@app/config/config.service';
 import { container } from '@app/container';
-import { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
 import { TYPES } from '@app/types';
 import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
 

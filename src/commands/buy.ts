@@ -1,5 +1,5 @@
 import { container } from '@app/container';
-import { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
 import { IExchange } from '@app/services/interfaces';
 import { TYPES } from '@app/types';
 import { BuyParams } from '@app/types/api';

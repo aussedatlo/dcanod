@@ -11,7 +11,7 @@ import buy_cmd from '@app/commands/buy';
 import setup_cmd from '@app/commands/setup';
 import sync_cmd from '@app/commands/sync';
 import { container, setupContainer } from '@app/container';
-import { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
 import { TYPES } from '@app/types';
 import { AppOptions } from '@app/types/app';
 

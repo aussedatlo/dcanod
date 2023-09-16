@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { inject, injectable } from 'inversify';
 
-import { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
 import { ICryptoResolver } from '@app/services/crypto/interface';
 import { TYPES } from '@app/types';
 

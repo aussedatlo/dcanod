@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { dirname } from 'path';
 
 import { IAppOptions } from '@app/config/options.service';
-import { ILogger } from '@app/logger/logger.service';
+import { ILogger } from '@app/logger/interface';
 import { TYPES } from '@app/types';
 import { Config } from '@app/types/config';
 import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
