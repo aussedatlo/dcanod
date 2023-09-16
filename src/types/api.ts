@@ -14,11 +14,3 @@ export type SyncParams = {
 export type UnknownParams = {
   command: string;
 };
-
-export type OrderResult = {
-  pair: string;
-  id: number | string;
-  time: number;
-  price: number;
-  quantity: number;
-};
