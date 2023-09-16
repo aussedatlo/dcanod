@@ -1,4 +1,4 @@
-export type Options = {
+export type AppOptions = {
   configFile?: string;
   debug?: boolean;
 };

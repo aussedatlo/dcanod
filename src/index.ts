@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 
-import pkg from '@app/../package.json';
-import buy_cmd from '@app/commands/buy';
-import setup_cmd from '@app/commands/setup';
-import sync_cmd from '@app/commands/sync';
-import { Options } from '@app/types/app';
-import { logErr } from '@app/utils/logger';
+import 'reflect-metadata';
+
 import chalk from 'chalk';
 import program from 'commander';
 import figlet from 'figlet';
+import pkg from 'package.json';
+
+import buy_cmd from '@app/commands/buy';
+import setup_cmd from '@app/commands/setup';
+import sync_cmd from '@app/commands/sync';
+import { container, setupContainer } from '@app/container';
+import { ILogger } from '@app/logger/logger.service';
+import { TYPES } from '@app/types';
+import { AppOptions } from '@app/types/app';
 
 const main = async () => {
   const title = chalk.yellowBright(
@@ -33,8 +38,9 @@ const main = async () => {
     .description('configure dcanod')
     .option('-d, --debug', 'output extra debugging information')
     .option('-c, --config-file <file>', 'path to the config file')
-    .action((options: Options) => {
-      setup_cmd(options);
+    .action((options: AppOptions) => {
+      setupContainer(options);
+      setup_cmd();
     });
 
   program
@@ -44,8 +50,9 @@ const main = async () => {
     .description('buy <ammount> of crypto using <pair>')
     .option('-d, --debug', 'output extra debugging information')
     .option('-c, --config-file <file>', 'path to the config file')
-    .action((pair: string, ammount: number, options: Options) => {
-      buy_cmd({ pair, ammount }, options);
+    .action((pair: string, ammount: number, options: AppOptions) => {
+      setupContainer(options);
+      buy_cmd({ pair, ammount });
     });
 
   program
@@ -54,13 +61,16 @@ const main = async () => {
     .description('sync all <pair> trades to ghostfolio')
     .option('-d, --debug', 'output extra debugging information')
     .option('-c, --config-file <file>', 'path to the config file')
-    .action((pair: string, options: Options) => {
-      sync_cmd({ pair }, options);
+    .action((pair: string, options: AppOptions) => {
+      setupContainer(options);
+      sync_cmd({ pair });
     });
 
   program.on('command:*', (commands?: string[]) => {
     if (commands) {
-      logErr(`unknown command: ${commands[0]}`);
+      setupContainer({});
+      const logger = container.get<ILogger>(TYPES.LoggerService);
+      logger.error(`unknown command: ${commands[0]}`);
     }
   });
 

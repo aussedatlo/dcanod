@@ -35,8 +35,11 @@
     "commander": "^7.0.0",
     "figlet": "^1.5.0",
     "ghostfolio-api": "^1.0.5",
+    "inversify": "^6.0.1",
+    "inversify-logger-middleware": "^3.1.0",
     "nexo-pro": "^1.2.2",
-    "prompts": "^2.4.1"
+    "prompts": "^2.4.1",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/figlet": "^1.2.1",

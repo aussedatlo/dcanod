@@ -1,45 +1,31 @@
+import { container } from '@app/container';
+import { ILogger } from '@app/logger/logger.service';
+import { IExchangeService } from '@app/services/nexo.service';
+import { TYPES } from '@app/types';
 import { BuyParams } from '@app/types/api';
-import { Options } from '@app/types/app';
-import { Config } from '@app/types/config';
-import { readConfig } from '@app/utils/config';
-import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
-import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
-import { getQuoteSafely, placeOrderSafely } from '@app/utils/nexo';
-import Client from 'nexo-pro';
 
-const buy = async (
-  { pair, ammount }: BuyParams,
-  { debug, configFile }: Options
-) => {
-  const config: Config = readConfig(configFile || DEFAULT_CONFIG_FILE);
-  if (debug) setDebug();
+const buy = async ({ pair, ammount }: BuyParams) => {
+  const logger = container.get<ILogger>(TYPES.LoggerService);
+  const nexo = container.get<IExchangeService>(TYPES.ExchangeService);
 
-  logDebug(`using file ${configFile || DEFAULT_CONFIG_FILE}`);
-
-  const { key: api_key, secret: api_secret } = config.nexo;
-  const nexo = Client({
-    api_key,
-    api_secret,
-  });
-
-  const quote = await getQuoteSafely(nexo, {
+  const quote = await nexo.getQuote({
     pair: pair,
     amount: ammount,
     side: 'buy',
   });
 
   if (!quote) {
-    logErr('unable to quote price');
+    logger.error('unable to quote price');
     return;
   }
 
-  logDebug(`current price: ${quote.price}`);
+  logger.debug(`current price: ${quote.price}`);
 
   const amountOut = ammount / quote.price;
 
-  logDebug(`amount to buy: ${amountOut}`);
+  logger.debug(`amount to buy: ${amountOut}`);
 
-  const order = await placeOrderSafely(nexo, {
+  const order = await nexo.placeOrder({
     pair: pair,
     side: 'buy',
     type: 'market',
@@ -47,11 +33,11 @@ const buy = async (
   });
 
   if (!order) {
-    logErr('unable to place order');
+    logger.error('unable to place order');
     return;
   }
 
-  logOk(`order placed: ${order.orderId}`);
+  logger.info(`order placed: ${order.orderId}`);
 };
 
 export default buy;

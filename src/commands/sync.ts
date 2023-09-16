@@ -1,35 +1,31 @@
-import { SyncParams } from '@app/types/api';
-import { Options } from '@app/types/app';
-import { Config } from '@app/types/config';
-import { getCryptoNameBySymbol } from '@app/utils/coingecko';
-import { readConfig } from '@app/utils/config';
-import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
-import { getUsdPriceFromSymbol } from '@app/utils/jsdelivr';
-import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
-import { getOrdersSafely } from '@app/utils/nexo';
-import ghostfolioApi from 'ghostfolio-api';
 import { ActivityImport } from 'ghostfolio-api/lib/types';
-import Client from 'nexo-pro';
 
-const sync = async ({ pair }: SyncParams, { debug, configFile }: Options) => {
-  const config: Config = readConfig(configFile || DEFAULT_CONFIG_FILE);
-  if (debug) setDebug();
+import { container } from '@app/container';
+import { ILogger } from '@app/logger/logger.service';
+import { ICryptoResolver } from '@app/services/coingecko.service';
+import { IGhostfolio } from '@app/services/ghostfolio.service';
+import { IForexResolver } from '@app/services/jsdelivr.service';
+import { IExchangeService } from '@app/services/nexo.service';
+import { TYPES } from '@app/types';
+import { SyncParams } from '@app/types/api';
 
-  logDebug(`using file ${configFile || DEFAULT_CONFIG_FILE}`);
+const sync = async ({ pair }: SyncParams) => {
+  const logger = container.get<ILogger>(TYPES.LoggerService);
+  const ghostfolio = container.get<IGhostfolio>(TYPES.GhostfolioService);
+  const exchange = container.get<IExchangeService>(TYPES.ExchangeService);
+  const crypto = container.get<ICryptoResolver>(TYPES.CryptoResolverService);
+  const forex = container.get<IForexResolver>(TYPES.ForexResolverService);
 
   const [asset1, asset2] = pair.split('/');
 
-  const symbol = await getCryptoNameBySymbol(asset1);
+  const symbol = await crypto.getCryptoNameBySymbol(asset1);
 
   if (!symbol) {
-    logErr(`unable to get name for symbol ${asset1}`);
+    logger.error(`unable to get name for symbol ${asset1}`);
     return;
   }
 
-  const { key: api_key, secret: api_secret } = config.nexo;
-  const nexo = Client({ api_key, api_secret });
-
-  const ordersResponse = await getOrdersSafely(nexo, {
+  const ordersResponse = await exchange.getOrders({
     endDate: Date.now(),
     startDate: 0,
     pageNum: 0,
@@ -38,37 +34,34 @@ const sync = async ({ pair }: SyncParams, { debug, configFile }: Options) => {
   });
 
   if (!ordersResponse) {
-    logErr('unable to fetch orders');
+    logger.error('unable to fetch orders');
     return;
   }
 
-  const gf = ghostfolioApi(
-    config.ghostfolio.secret,
-    config.ghostfolio.hostname,
-    Number(config.ghostfolio.port)
-  );
-
-  const { activities } = await gf.order();
+  const { activities } = await ghostfolio.order();
 
   await Promise.all(
     ordersResponse.orders.map(async (order) => {
       if (
         activities.findIndex((activity) => activity.comment === order.id) !== -1
       ) {
-        logDebug(`order ${order.id} already synced`);
+        logger.debug(`order ${order.id} already synced`);
         return;
       }
 
       if (order.executedQuantity.toString() === '0') {
-        logDebug(`order ${order.id} is invalid`);
+        logger.debug(`order ${order.id} is invalid`);
         return;
       }
 
       const date = new Date(order.timestamp * 1000).toISOString().split('T')[0];
-      const price = await getUsdPriceFromSymbol(asset2.toLowerCase(), date);
+      const price = await forex.getUsdPriceFromSymbol(
+        asset2.toLowerCase(),
+        date
+      );
 
       if (!price) {
-        logErr(`unable to get price of ${asset2}`);
+        logger.error(`unable to get price of ${asset2}`);
         return;
       }
 
@@ -84,21 +77,18 @@ const sync = async ({ pair }: SyncParams, { debug, configFile }: Options) => {
         dataSource: 'COINGECKO',
       };
 
-      if (config.ghostfolio.accountId)
-        activity.accountId = config.ghostfolio.accountId;
-
       try {
-        await gf.importData({ activities: [activity] });
-        logOk(
+        await ghostfolio.importData({ activities: [activity] });
+        logger.info(
           `synced ${date} ${order.id} order with USD/${asset2} price ${price}`
         );
       } catch (e) {
-        logErr(`unable to import ${order.id}`);
+        logger.error(`unable to import ${order.id}`);
       }
     })
   );
 
-  logOk('sync done');
+  logger.info('sync done');
 };
 
 export default sync;
