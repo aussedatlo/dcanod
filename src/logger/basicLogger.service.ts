@@ -5,7 +5,7 @@ import { ILogger } from '@app/logger/interface';
 
 @injectable()
 class BasicLoggerService implements ILogger {
-  debug = (s: string) => {};
+  debug = () => {};
   info = (s: string) => console.log(chalk.green('✔ ') + s);
   error = (s: string) => console.log(chalk.red('✖ ') + 'Error: ' + s);
 }

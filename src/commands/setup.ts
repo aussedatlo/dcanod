@@ -17,7 +17,7 @@ const setup_cmd = async () => {
       message: '[Nexo] key: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
-          ? `incorrect Api key`
+          ? 'incorrect Api key'
           : true,
     },
     {
