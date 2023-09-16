@@ -6,9 +6,9 @@ import { BuyParams } from '@app/types/api';
 
 const buy = async ({ pair, ammount }: BuyParams) => {
   const logger = container.get<ILogger>(TYPES.LoggerService);
-  const nexo = container.get<IExchange>(TYPES.ExchangeService);
+  const exchange = container.get<IExchange>(TYPES.ExchangeService);
 
-  const quote = await nexo.getQuote({
+  const quote = await exchange.getQuote({
     pair: pair,
     amount: ammount,
     side: 'buy',
@@ -25,7 +25,7 @@ const buy = async ({ pair, ammount }: BuyParams) => {
 
   logger.debug(`amount to buy: ${amountOut}`);
 
-  const order = await nexo.placeOrder({
+  const order = await exchange.placeOrder({
     pair: pair,
     side: 'buy',
     type: 'market',
