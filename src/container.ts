@@ -3,6 +3,7 @@ import { Container } from 'inversify';
 import FileConfigService, { IConfig } from '@app/config/config.service';
 import OptionsService, { IAppOptions } from '@app/config/options.service';
 import BasicLoggerService from '@app/logger/basicLogger.service';
+import DebugLoggerService from '@app/logger/debugLogger.service';
 import { ILogger } from '@app/logger/interface';
 import CoingeckoService from '@app/services/crypto/coingecko.service';
 import NexoService from '@app/services/exchange/nexo.service';
@@ -17,14 +18,17 @@ import {
 import { TYPES } from '@app/types';
 import { AppOptions } from '@app/types/app';
 
+const DEFAULT_OPTIONS: AppOptions = { debug: undefined, configFile: undefined };
 const container = new Container();
 
-const setupContainer = (options: AppOptions) => {
+const setupContainer = (options: AppOptions = DEFAULT_OPTIONS) => {
   container
     .bind<IAppOptions>(TYPES.AppOptions)
     .toConstantValue(new OptionsService(options));
 
-  container.bind<ILogger>(TYPES.LoggerService).to(BasicLoggerService);
+  if (options.debug)
+    container.bind<ILogger>(TYPES.LoggerService).to(DebugLoggerService);
+  else container.bind<ILogger>(TYPES.LoggerService).to(BasicLoggerService);
   container
     .bind<IConfig>(TYPES.ConfigService)
     .to(FileConfigService)
