@@ -4,7 +4,7 @@ import { container } from '@app/container';
 import { ILogger } from '@app/logger/logger.service';
 import {
   ICryptoResolver,
-  IExchangeService,
+  IExchange,
   IForexResolver,
   IGhostfolio,
 } from '@app/services/interfaces';
@@ -14,7 +14,7 @@ import { SyncParams } from '@app/types/api';
 const sync = async ({ pair }: SyncParams) => {
   const logger = container.get<ILogger>(TYPES.LoggerService);
   const ghostfolio = container.get<IGhostfolio>(TYPES.GhostfolioService);
-  const exchange = container.get<IExchangeService>(TYPES.ExchangeService);
+  const exchange = container.get<IExchange>(TYPES.ExchangeService);
   const crypto = container.get<ICryptoResolver>(TYPES.CryptoResolverService);
   const forex = container.get<IForexResolver>(TYPES.ForexResolverService);
 

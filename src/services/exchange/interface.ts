@@ -9,7 +9,7 @@ import {
 
 // TODO: remove nexo dependency
 
-export interface IExchangeService {
+export interface IExchange {
   getOrders: (params: OrdersParams) => Promise<OrdersResponse | undefined>;
   getQuote: (params: QuoteParams) => Promise<QuoteResponse | undefined>;
   placeOrder: (param: OrderParams) => Promise<OrderResponse | undefined>;

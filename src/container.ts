@@ -11,7 +11,7 @@ import GhostfolioService, {
 import JsdelivrService, {
   IForexResolver,
 } from '@app/services/jsdelivr.service';
-import NexoService, { IExchangeService } from '@app/services/nexo.service';
+import NexoService, { IExchange } from '@app/services/nexo.service';
 import { TYPES } from '@app/types';
 import { AppOptions } from '@app/types/app';
 
@@ -33,7 +33,7 @@ const setupContainer = (options: AppOptions) => {
   container
     .bind<IForexResolver>(TYPES.ForexResolverService)
     .to(JsdelivrService);
-  container.bind<IExchangeService>(TYPES.ExchangeService).to(NexoService);
+  container.bind<IExchange>(TYPES.ExchangeService).to(NexoService);
   container.bind<IGhostfolio>(TYPES.GhostfolioService).to(GhostfolioService);
 };
 

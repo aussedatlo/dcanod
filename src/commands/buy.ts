@@ -1,12 +1,12 @@
 import { container } from '@app/container';
 import { ILogger } from '@app/logger/logger.service';
-import { IExchangeService } from '@app/services/interfaces';
+import { IExchange } from '@app/services/interfaces';
 import { TYPES } from '@app/types';
 import { BuyParams } from '@app/types/api';
 
 const buy = async ({ pair, ammount }: BuyParams) => {
   const logger = container.get<ILogger>(TYPES.LoggerService);
-  const nexo = container.get<IExchangeService>(TYPES.ExchangeService);
+  const nexo = container.get<IExchange>(TYPES.ExchangeService);
 
   const quote = await nexo.getQuote({
     pair: pair,

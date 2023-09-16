@@ -11,11 +11,11 @@ import {
 } from 'nexo-pro/lib/types/client';
 
 import { IConfigService } from '@app/config/config.service';
-import { IExchangeService } from '@app/services/exchange/interface';
+import { IExchange } from '@app/services/exchange/interface';
 import { TYPES } from '@app/types';
 
 @injectable()
-class NexoService implements IExchangeService {
+class NexoService implements IExchange {
   public client: NexoProClient;
 
   constructor(@inject(TYPES.ConfigService) configService: IConfigService) {
