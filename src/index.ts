@@ -7,10 +7,10 @@ import program from 'commander';
 import figlet from 'figlet';
 import pkg from 'package.json';
 
-import buy_cmd from '@app/commands/buy';
-import setup_cmd from '@app/commands/setup';
-import sync_cmd from '@app/commands/sync';
-import unknown_cmd from '@app/commands/unknown';
+import buy from '@app/commands/buy';
+import setup from '@app/commands/setup';
+import sync from '@app/commands/sync';
+import unknown from '@app/commands/unknown';
 import { setupContainer } from '@app/container';
 import { AppOptions } from '@app/types/app';
 
@@ -39,7 +39,7 @@ const main = async () => {
     .option('-c, --config-file <file>', 'path to the config file')
     .action((options: AppOptions) => {
       setupContainer(options);
-      setup_cmd();
+      setup();
     });
 
   program
@@ -51,7 +51,7 @@ const main = async () => {
     .option('-c, --config-file <file>', 'path to the config file')
     .action((pair: string, ammount: number, options: AppOptions) => {
       setupContainer(options);
-      buy_cmd({ pair, ammount });
+      buy({ pair, ammount });
     });
 
   program
@@ -62,13 +62,13 @@ const main = async () => {
     .option('-c, --config-file <file>', 'path to the config file')
     .action((pair: string, options: AppOptions) => {
       setupContainer(options);
-      sync_cmd({ pair });
+      sync({ pair });
     });
 
   program.on('command:*', (commands?: string[]) => {
     if (commands) {
-      setupContainer({});
-      unknown_cmd({ command: commands[0] });
+      setupContainer();
+      unknown({ command: commands[0] });
     }
   });
 
