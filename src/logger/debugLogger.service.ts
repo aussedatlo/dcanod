@@ -7,7 +7,7 @@ import { ILogger } from '@app/logger/interface';
 class DebugLoggerService implements ILogger {
   debug = (s: string) => console.log(`[${chalk.blue('DBG ')}]: ${s}`);
   info = (s: string) => console.log(`[${chalk.green('INFO')}]: ${s}`);
-  error = (s: string) => console.log(`[${chalk.green('ERR ')}]: ${s}`);
+  error = (s: string) => console.error(`[${chalk.green('ERR ')}]: ${s}`);
 }
 
 export default DebugLoggerService;

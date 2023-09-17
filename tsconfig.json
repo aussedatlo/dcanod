@@ -24,12 +24,5 @@
     "outDir": "lib"
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "**/node_modules/*",
-    "coverage",
-    "doc",
-    "**/__mocks__/*",
-    "**/__tests__/*"
-  ]
+  "exclude": ["node_modules", "**/node_modules/*", "coverage", "doc"]
 }
