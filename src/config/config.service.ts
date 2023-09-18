@@ -23,20 +23,19 @@ class FileConfigService implements IConfig {
     @inject(TYPES.AppOptions) options: IAppOptions
   ) {
     this.logger = logger;
-    this.config = this.readConfig(
-      options.options.configFile || DEFAULT_CONFIG_FILE
-    );
+    this.readConfig(options.options.configFile || DEFAULT_CONFIG_FILE);
   }
 
   private readConfig(file: string = DEFAULT_CONFIG_FILE) {
     this.logger.debug(`using config file ${file}`);
     const config = readFileSync(file, 'utf-8');
-    return { ...JSON.parse(config), path: file };
+    this.config = { ...JSON.parse(config), path: file };
   }
 
   public saveConfig(data: Config, file: string = DEFAULT_CONFIG_FILE) {
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, JSON.stringify(data));
+    this.readConfig(file);
   }
 }
 
