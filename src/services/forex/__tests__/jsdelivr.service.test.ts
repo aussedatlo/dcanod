@@ -6,7 +6,7 @@ import { ILogger } from '@app/logger/interface';
 import JsdelivrService from '@app/services/forex/jsdelivr.service';
 import { TYPES } from '@app/types';
 
-describe('Service: Debug Logger', () => {
+describe('Service: JSDelivr', () => {
   let container: Container;
 
   beforeEach(() => {

@@ -26,7 +26,7 @@ export const mockNexoPro = () => {
   return { client, getQuote, placeOrder, getOrderDetails, getOrders };
 };
 
-describe('Service: Debug Logger', () => {
+describe('Service: Nexo', () => {
   let container: Container;
   let nexoProMock: ReturnType<typeof mockNexoPro>;
 

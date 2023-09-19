@@ -6,7 +6,7 @@ import { ILogger } from '@app/logger/interface';
 import CoingeckoService from '@app/services/crypto/coingecko.service';
 import { TYPES } from '@app/types';
 
-describe('Service: Debug Logger', () => {
+describe('Service: Coingecko', () => {
   let container: Container;
 
   beforeEach(() => {

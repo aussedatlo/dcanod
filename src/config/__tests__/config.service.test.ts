@@ -11,7 +11,7 @@ import { Config } from '@app/types/config';
 
 jest.mock('fs');
 
-describe('Service: Debug Logger', () => {
+describe('Service: Config', () => {
   let container: Container;
   let fakeConfigPath = '/path/to/config';
   let fakeConfig: Config = {
