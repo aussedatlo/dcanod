@@ -28,11 +28,7 @@ const sync = async ({ pair }: SyncParams) => {
   }
 
   const ordersResponse = await exchange.getOrders({
-    endDate: Date.now(),
-    startDate: 0,
-    pageNum: 0,
-    pageSize: 50,
-    pairs: [pair],
+    pair,
   });
 
   if (!ordersResponse) {

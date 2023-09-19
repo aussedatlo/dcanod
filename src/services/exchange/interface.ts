@@ -1,16 +1,35 @@
-import {
-  OrderParams,
-  OrderResponse,
-  OrdersParams,
-  OrdersResponse,
-  QuoteParams,
-  QuoteResponse,
-} from 'nexo-pro/lib/types/client';
+export type GetOrdersParams = {
+  pair: string;
+};
 
-// TODO: remove nexo dependency
+export type GetOrdersResponse = {
+  orders: any[]; // TODO: fix any
+};
+
+export type GetQuoteParams = {
+  pair: string;
+  amount: number;
+};
+
+export type GetQuoteResponse = {
+  price: number;
+};
+
+export type PlaceOrderParams = {
+  pair: string;
+  quantity: number;
+};
+
+export type PlaceOrderResponse = {
+  id: string;
+};
 
 export interface IExchange {
-  getOrders: (params: OrdersParams) => Promise<OrdersResponse | undefined>;
-  getQuote: (params: QuoteParams) => Promise<QuoteResponse | undefined>;
-  placeOrder: (param: OrderParams) => Promise<OrderResponse | undefined>;
+  getOrders: (
+    params: GetOrdersParams
+  ) => Promise<GetOrdersResponse | undefined>;
+  getQuote: (params: GetQuoteParams) => Promise<GetQuoteResponse | undefined>;
+  placeOrder: (
+    param: PlaceOrderParams
+  ) => Promise<PlaceOrderResponse | undefined>;
 }

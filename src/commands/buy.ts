@@ -11,7 +11,6 @@ const buy = async ({ pair, amount }: BuyParams) => {
   const quote = await exchange.getQuote({
     pair: pair,
     amount: amount,
-    side: 'buy',
   });
 
   if (!quote) {
@@ -27,8 +26,6 @@ const buy = async ({ pair, amount }: BuyParams) => {
 
   const order = await exchange.placeOrder({
     pair: pair,
-    side: 'buy',
-    type: 'market',
     quantity: amountOut,
   });
 
@@ -37,7 +34,7 @@ const buy = async ({ pair, amount }: BuyParams) => {
     return;
   }
 
-  logger.info(`order placed: ${order.orderId}`);
+  logger.info(`order placed: ${order.id}`);
 };
 
 export default buy;
