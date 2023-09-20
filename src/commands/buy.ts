@@ -8,6 +8,11 @@ const buy = async ({ pair, amount }: BuyParams) => {
   const logger = container.get<ILogger>(TYPES.LoggerService);
   const exchange = container.get<IExchange>(TYPES.ExchangeService);
 
+  if (amount <= 0) {
+    logger.error('invalid amount');
+    return;
+  }
+
   const quote = await exchange.getQuote({
     pair: pair,
     amount: amount,
