@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { Container } from 'inversify';
 import * as NexoProModule from 'nexo-pro';
+import { NexoProClient } from 'nexo-pro/lib/types/client';
 
 import { IConfig } from '@app/config/config.service';
 import NexoService from '@app/services/exchange/nexo.service';
@@ -16,12 +17,15 @@ export const mockNexoPro = () => {
   const getOrderDetails = jest.fn();
   const getOrders = jest.fn();
 
-  const client = jest.fn(() => ({
-    getQuote,
-    placeOrder,
-    getOrderDetails,
-    getOrders,
-  }));
+  const client = jest.fn(
+    (): NexoProClient =>
+      ({
+        getQuote: getQuote as NexoProClient['getQuote'],
+        placeOrder: placeOrder as NexoProClient['placeOrder'],
+        getOrderDetails: getOrderDetails as NexoProClient['getOrderDetails'],
+        getOrders: getOrders as NexoProClient['getOrders'],
+      } as NexoProClient)
+  );
 
   return { client, getQuote, placeOrder, getOrderDetails, getOrders };
 };
@@ -34,9 +38,7 @@ describe('Service: Nexo', () => {
     jest.clearAllMocks();
 
     nexoProMock = mockNexoPro();
-    jest
-      .spyOn(NexoProModule, 'default')
-      .mockImplementation(nexoProMock.client as any);
+    jest.spyOn(NexoProModule, 'default').mockImplementation(nexoProMock.client);
 
     container = new Container();
     container.bind<IConfig>(TYPES.ConfigService).toConstantValue({
