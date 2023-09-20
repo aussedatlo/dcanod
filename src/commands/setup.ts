@@ -53,12 +53,13 @@ const setup_cmd = async () => {
 
   if (
     !response.apiKey ||
-    !response.apiKey ||
+    !response.apiSecret ||
     !response.gfHostname ||
     !response.gfPort ||
     !response.gfSecret
   ) {
     logger.error('incorrect setup');
+    return;
   }
 
   config.saveConfig({
