@@ -143,4 +143,111 @@ describe('Command: Sync', () => {
     expect(ghostfolioMock.importData).not.toHaveBeenCalled();
     expect(loggerMock.info).toHaveBeenCalledWith('sync done');
   });
+
+  it('should sync multiple non alrady synced orders', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id-1',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+        {
+          id: 'order-id-2',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+        {
+          id: 'order-id-3',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [{ comment: 'order-id-2' } as Activity] };
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(10);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalled();
+    expect(ghostfolioMock.importData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        activities: expect.arrayContaining([
+          expect.objectContaining({ comment: 'order-id-1' }),
+        ]),
+      })
+    );
+    expect(ghostfolioMock.importData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        activities: expect.arrayContaining([
+          expect.objectContaining({ comment: 'order-id-3' }),
+        ]),
+      })
+    );
+    expect(ghostfolioMock.importData).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        activities: expect.arrayContaining([
+          expect.objectContaining({ comment: 'order-id-2' }),
+        ]),
+      })
+    );
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
+
+  it('should return an error when enable to get crypto name', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+
+    jest
+      .spyOn(cryptoMock, 'getCryptoNameBySymbol')
+      .mockResolvedValue(undefined);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      'unable to get name for symbol BTC'
+    );
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).not.toHaveBeenCalledWith('sync done');
+  });
+
+  it('should return an error when unable to get orders', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(undefined);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith('unable to fetch orders');
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).not.toHaveBeenCalledWith('sync done');
+  });
+
+  it('should not sync when order is invalid/cancelled', async () => {});
+
+  it('should display an error when unable to import through ghostfolio', async () => {});
+
+  it('should not sync when unable to get usd price', async () => {});
 });
