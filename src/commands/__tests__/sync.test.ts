@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 
+import { Activity } from 'ghostfolio-api/lib/types';
+
 import sync from '@app/commands/sync';
 import { container } from '@app/container';
 import { ILogger } from '@app/logger/interface';
@@ -11,7 +13,6 @@ import {
   IGhostfolio,
 } from '@app/services/interfaces';
 import { TYPES } from '@app/types';
-import { Activity } from 'ghostfolio-api/lib/types';
 
 describe('Command: Sync', () => {
   let loggerMock: ILogger;
@@ -245,9 +246,98 @@ describe('Command: Sync', () => {
     expect(loggerMock.info).not.toHaveBeenCalledWith('sync done');
   });
 
-  it('should not sync when order is invalid/cancelled', async () => {});
+  it('should not sync when order is invalid/cancelled', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 0,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
 
-  it('should display an error when unable to import through ghostfolio', async () => {});
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
 
-  it('should not sync when unable to get usd price', async () => {});
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalledWith(
+      'order order-id is invalid'
+    );
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
+
+  it('should display an error when unable to import through ghostfolio', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(10);
+    jest.spyOn(ghostfolioMock, 'importData').mockRejectedValue(undefined);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith('unable to import order-id');
+    expect(ghostfolioMock.importData).toHaveBeenCalledTimes(1);
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
+
+  it('should not sync when unable to get usd price', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(undefined);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith('unable to get price of USD');
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
 });
