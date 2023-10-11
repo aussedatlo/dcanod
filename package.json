@@ -10,7 +10,7 @@
     "prettier": "prettier --check 'src/**/*.ts'",
     "prettier:write": "prettier --write 'src/**/*.ts'",
     "lint": "npx eslint src/*",
-    "test": "jest ./src/.*/__tests__/.*.test.ts"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
