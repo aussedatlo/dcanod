@@ -1,85 +1,77 @@
 import 'reflect-metadata';
 
 import * as fs from 'fs';
-import { Container } from 'inversify';
 
-import FileConfigService from '@app/config/config.service';
-import { IAppOptions } from '@app/config/options.service';
-import { ILogger } from '@app/logger/interface';
+import FileConfigService, { IConfig } from '@app/config/config.service';
+import { container } from '@app/container';
 import { TYPES } from '@app/types';
+import { ILogger } from '@app/logger/interface';
+import { IAppOptions } from '@app/config/options.service';
 import { Config } from '@app/types/config';
+import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
 
 jest.mock('fs');
 
-describe('Service: Config', () => {
-  let container: Container;
-  let fakeConfigPath = '/path/to/config';
-  let fakeConfig: Config = {
-    nexo: { key: 'key', secret: 'secret' },
-    ghostfolio: {
-      hostname: 'hostname',
-      port: '1',
-      secret: 'secret',
-      accountId: 'accountId',
-    },
-  };
-  let newFakeConfig = {
-    ...fakeConfig,
-    nexo: { ...fakeConfig.nexo, secret: 'newSecret' },
-  };
+describe('Config: File config service', () => {
+  let loggerMock: ILogger;
+  let fsMock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-
-    container = new Container();
-    const mockLoggerService: ILogger = {
+    loggerMock = {
       debug: jest.fn(),
       info: jest.fn(),
       error: jest.fn(),
     };
-    container
-      .bind<ILogger>(TYPES.LoggerService)
-      .toConstantValue(mockLoggerService);
+
+    fsMock = {
+      readFileSync: jest.fn(),
+    };
   });
 
-  it('should load a specific config file properly', async () => {
-    jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(fakeConfig));
-    const mockAppOptions: IAppOptions = {
-      options: { configFile: fakeConfigPath },
-    };
-    container
-      .bind<IAppOptions>(TYPES.AppOptions)
-      .toConstantValue(mockAppOptions);
-    const { config } = container.resolve(FileConfigService);
+  afterEach(() => {
+    jest.clearAllMocks();
+    container.unbindAll();
+  });
 
+  it('should create a config from default config file', async () => {
+    // Arrange
+    const options: IAppOptions = { options: {} };
+    const fakeConfig = {} as Config;
+    jest.spyOn(fs, 'readFileSync').mockImplementation(fsMock.readFileSync);
+    fsMock.readFileSync.mockReturnValue(JSON.stringify(fakeConfig));
+
+    // Act
+    container
+      .bind<IConfig>(TYPES.ConfigService)
+      .toConstantValue(new FileConfigService(loggerMock, options));
+    const { config } = container.get<IConfig>(TYPES.ConfigService);
+
+    // Assert
+    expect(config).toStrictEqual({ ...fakeConfig, path: DEFAULT_CONFIG_FILE });
+    expect(fsMock.readFileSync).toBeCalledWith(DEFAULT_CONFIG_FILE, 'utf-8');
+  });
+
+  it('should create a config from specific config file', async () => {
+    // Arrange
+    const options: IAppOptions = { options: { configFile: '/path/to/file' } };
+    const fakeConfig = {} as Config;
+    jest.spyOn(fs, 'readFileSync').mockImplementation(fsMock.readFileSync);
+    fsMock.readFileSync.mockReturnValue(JSON.stringify(fakeConfig));
+
+    // Act
+    container
+      .bind<IConfig>(TYPES.ConfigService)
+      .toConstantValue(new FileConfigService(loggerMock, options));
+    const { config } = container.get<IConfig>(TYPES.ConfigService);
+
+    // Assert
     expect(config).toStrictEqual({
       ...fakeConfig,
-      path: fakeConfigPath,
+      path: options.options.configFile,
     });
-  });
-
-  it('should save and update the config properly', async () => {
-    const readFileSyncSpy = jest
-      .spyOn(fs, 'writeFileSync')
-      .mockImplementation(() => {});
-    jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(fakeConfig));
-    const mockAppOptions: IAppOptions = {
-      options: { configFile: fakeConfigPath },
-    };
-    container
-      .bind<IAppOptions>(TYPES.AppOptions)
-      .toConstantValue(mockAppOptions);
-    let service = container.resolve(FileConfigService);
-
-    jest
-      .spyOn(fs, 'readFileSync')
-      .mockReturnValue(JSON.stringify(newFakeConfig));
-
-    service.saveConfig(newFakeConfig, fakeConfigPath);
-
-    expect(service.config).toStrictEqual({
-      ...newFakeConfig,
-      path: fakeConfigPath,
-    });
+    expect(fsMock.readFileSync).toBeCalledWith(
+      options.options.configFile,
+      'utf-8'
+    );
   });
 });
