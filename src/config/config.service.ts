@@ -23,7 +23,7 @@ class FileConfigService implements IConfig {
     @inject(TYPES.AppOptions) options: IAppOptions
   ) {
     this.logger = logger;
-    this.readConfig(options.options.configFile || DEFAULT_CONFIG_FILE);
+    this.readConfig(options.options.configFile);
   }
 
   private readConfig(file: string = DEFAULT_CONFIG_FILE) {
