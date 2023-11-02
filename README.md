@@ -26,9 +26,8 @@ providing a smooth and efficient experience for managing their crypto investment
 ## Install
 
 ```shell
-npm install
-npm run build
-npm install -g
+pnpm install
+pnpm build
 ```
 
 ## Setup command
@@ -84,5 +83,5 @@ To run DCANod every Monday at 8 AM, add the following line to the crontab:
 ## Tests
 
 ```shell
-npm run test
+pnpm test
 ```
