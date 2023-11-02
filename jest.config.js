@@ -5,4 +5,7 @@ module.exports = {
   moduleNameMapper: {
     '^@app/(.*)$': '<rootDir>/src/$1',
   },
+  collectCoverage: true,
+  collectCoverageFrom: ['src/**/*.ts'],
+  testRegex: '(src/__tests__/.*|(\\.|/)(test|spec))\\.ts$',
 };

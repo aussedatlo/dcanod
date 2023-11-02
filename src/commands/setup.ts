@@ -1,17 +1,14 @@
-import { Options } from '@app/types/app';
-import { saveConfig } from '@app/utils/config';
-import {
-  DEFAULT_CONFIG_FILE,
-  KEY_LENGTH_MAX,
-  KEY_LENGTH_MIN,
-} from '@app/utils/constant';
-import { logDebug, logErr, logOk, setDebug } from '@app/utils/logger';
 import prompts from 'prompts';
 
-const setup_cmd = async ({ debug, configFile }: Options) => {
-  if (debug) setDebug();
+import { IConfig } from '@app/config/config.service';
+import { container } from '@app/container';
+import { ILogger } from '@app/logger/interface';
+import { TYPES } from '@app/types';
+import { KEY_LENGTH_MAX, KEY_LENGTH_MIN } from '@app/utils/constant';
 
-  logDebug(`using file ${configFile}`);
+const setup_cmd = async () => {
+  const logger = container.get<ILogger>(TYPES.LoggerService);
+  const config = container.get<IConfig>(TYPES.ConfigService);
 
   const response = await prompts([
     {
@@ -20,7 +17,7 @@ const setup_cmd = async ({ debug, configFile }: Options) => {
       message: '[Nexo] key: ',
       validate: (value: string) =>
         KEY_LENGTH_MIN < value.length && value.length > KEY_LENGTH_MAX
-          ? `incorrect Api key`
+          ? 'incorrect Api key'
           : true,
     },
     {
@@ -56,27 +53,26 @@ const setup_cmd = async ({ debug, configFile }: Options) => {
 
   if (
     !response.apiKey ||
-    !response.apiKey ||
+    !response.apiSecret ||
     !response.gfHostname ||
     !response.gfPort ||
     !response.gfSecret
   ) {
-    logErr('incorrect setup');
+    logger.error('incorrect setup');
+    return;
   }
 
-  saveConfig(
-    {
-      nexo: { key: response.apiKey, secret: response.apiSecret },
-      ghostfolio: {
-        hostname: response.gfHostname,
-        port: response.gfPort,
-        secret: response.gfSecret,
-        accountId: response.gfAccountId,
-      },
+  config.saveConfig({
+    nexo: { key: response.apiKey, secret: response.apiSecret },
+    ghostfolio: {
+      hostname: response.gfHostname,
+      port: response.gfPort,
+      secret: response.gfSecret,
+      accountId: response.gfAccountId,
     },
-    configFile || DEFAULT_CONFIG_FILE
-  );
-  logOk('Configuration saved');
+  });
+
+  logger.info('Configuration saved');
 };
 
 export default setup_cmd;

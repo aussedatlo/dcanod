@@ -26,9 +26,7 @@ providing a smooth and efficient experience for managing their crypto investment
 ## Install
 
 ```shell
-npm install
-npm run build
-npm install -g
+pnpm i -g dcanod
 ```
 
 ## Setup command
@@ -58,7 +56,7 @@ dcanod-cli setup -c /tmp/dcanod/newconfig.json
 
 ## Buy command
 
-Buy a specific ammount of crypto.
+Buy a specific amount of crypto.
 
 ```shell
 dcanod-cli buy BTC/USDT 15
@@ -81,8 +79,15 @@ To run DCANod every Monday at 8 AM, add the following line to the crontab:
 0 8 * * 1 dcanod-cli BTC/USDT 20
 ```
 
+## Build locally
+
+```shell
+pnpm build
+```
+
 ## Tests
 
 ```shell
-npm run test
+pnpm test
+pnpm prettier
 ```

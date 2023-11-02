@@ -1,285 +1,343 @@
-import * as GhostfolioApiModule from 'ghostfolio-api';
-import { Activities, Activity, ActivityImport } from 'ghostfolio-api/lib/types';
-import * as NexoProModule from 'nexo-pro';
-import { Order } from 'nexo-pro/lib/types/client';
-import { mockGhostfolioApi } from '../../__mocks__/ghostfolio.mock';
-import { mockLogger } from '../../__mocks__/logger.mock';
-import { mockNexoPro } from '../../__mocks__/nexo-pro.mock';
-import * as CoingeckoModule from '../../utils/coingecko';
-import * as ConfigModule from '../../utils/config';
-import * as JsdelivrModule from '../../utils/jsdelivr';
-import * as LoggerModule from '../../utils/logger';
-import sync from '../sync';
+import 'reflect-metadata';
 
-jest.mock('ghostfolio-api');
-jest.mock('nexo-pro');
-jest.mock('../../utils/coingecko');
-jest.mock('../../utils/config');
-jest.mock('../../utils/jsdelivr');
-jest.mock('../../utils/logger');
+import { Activity } from 'ghostfolio-api/lib/types';
 
-describe('Buy command', () => {
-  const orders: Order[] = [
-    {
-      id: 'id-1',
-      exchangeRate: 100,
-      executedQuantity: 50,
-      feeAsset: null,
-      pair: 'BTC/USD',
-      quantity: 10,
-      side: 'buy',
-      timestamp: 1,
-      tradeFee: null,
-    },
-    {
-      id: 'id-2',
-      exchangeRate: 200,
-      executedQuantity: 60,
-      feeAsset: null,
-      pair: 'BTC/USD',
-      quantity: 20,
-      side: 'sell',
-      timestamp: 2,
-      tradeFee: null,
-    },
-  ];
+import sync from '@app/commands/sync';
+import { container } from '@app/container';
+import { ILogger } from '@app/logger/interface';
+import { GetOrdersResponse } from '@app/services/exchange/interface';
+import {
+  ICryptoResolver,
+  IExchange,
+  IForexResolver,
+  IGhostfolio,
+} from '@app/services/interfaces';
+import { TYPES } from '@app/types';
 
-  const ActivitiesImport: Array<ActivityImport> = [
-    {
-      comment: 'id-1',
-      currency: 'USD',
-      dataSource: 'COINGECKO',
-      date: '1970-01-01T00:00:01.000Z',
-      fee: 0,
-      quantity: 50,
-      symbol: 'bitcoin',
-      type: 'BUY',
-      unitPrice: 120,
-    },
-    {
-      comment: 'id-2',
-      currency: 'USD',
-      dataSource: 'COINGECKO',
-      date: '1970-01-01T00:00:02.000Z',
-      fee: 0,
-      quantity: 60,
-      symbol: 'bitcoin',
-      type: 'SELL',
-      unitPrice: 240,
-    },
-  ];
-
-  const activities: Activities = { activities: [] };
-  const gfMock = mockGhostfolioApi();
-  const nexoProMock = mockNexoPro();
-  const loggerMock = mockLogger();
+describe('Command: Sync', () => {
+  let loggerMock: ILogger;
+  let exchangeMock: IExchange;
+  let ghostfolioMock: IGhostfolio;
+  let cryptoMock: ICryptoResolver;
+  let forexMock: IForexResolver;
 
   beforeEach(() => {
+    loggerMock = {
+      debug: jest.fn(),
+      info: jest.fn(),
+      error: jest.fn(),
+    };
+    exchangeMock = {
+      getQuote: jest.fn(),
+      placeOrder: jest.fn(),
+      getOrders: jest.fn(),
+    };
+    ghostfolioMock = {
+      importData: jest.fn(),
+      order: jest.fn(),
+    };
+    cryptoMock = {
+      getCryptoNameBySymbol: jest.fn(),
+    };
+    forexMock = {
+      getUsdPriceFromSymbol: jest.fn(),
+    };
+
+    container.bind<ILogger>(TYPES.LoggerService).toConstantValue(loggerMock);
+    container
+      .bind<IExchange>(TYPES.ExchangeService)
+      .toConstantValue(exchangeMock);
+    container
+      .bind<IGhostfolio>(TYPES.GhostfolioService)
+      .toConstantValue(ghostfolioMock);
+    container
+      .bind<ICryptoResolver>(TYPES.CryptoResolverService)
+      .toConstantValue(cryptoMock);
+    container
+      .bind<IForexResolver>(TYPES.ForexResolverService)
+      .toConstantValue(forexMock);
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
-
-    jest
-      .spyOn(CoingeckoModule, 'getCryptoNameBySymbol')
-      .mockResolvedValue('bitcoin');
-    jest
-      .spyOn(NexoProModule, 'default')
-      .mockImplementation(nexoProMock.client as any);
-    jest.spyOn(GhostfolioApiModule, 'default').mockImplementation(gfMock.gf);
-    jest.spyOn(JsdelivrModule, 'getUsdPriceFromSymbol').mockResolvedValue(1.2);
-    jest.spyOn(ConfigModule, 'readConfig').mockReturnValue({
-      nexo: { key: 'nexo-key', secret: 'nexo-secret' },
-      ghostfolio: { hostname: '', port: '', secret: '' },
-    });
-
-    jest.mocked(LoggerModule.logDebug).mockImplementation(loggerMock.logDebug);
-    jest.mocked(LoggerModule.logErr).mockImplementation(loggerMock.logErr);
-    jest.mocked(LoggerModule.logOk).mockImplementation(loggerMock.logOk);
-    jest.mocked(LoggerModule.setDebug).mockImplementation(loggerMock.setDebug);
-
-    nexoProMock.getOrders.mockResolvedValue({ orders });
-    gfMock.order.mockResolvedValue(activities);
+    container.unbindAll();
   });
 
-  it('should create an api nexo with correct config params', async () => {
-    await sync({ pair: 'BTC/USD' }, {});
+  it('should execute a successful sync without orders', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = { orders: [] };
+    const activities = { activities: [] };
 
-    expect(nexoProMock.client).toHaveBeenCalledTimes(1);
-    expect(nexoProMock.client).toHaveBeenCalledWith({
-      api_key: 'nexo-key',
-      api_secret: 'nexo-secret',
-    });
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalled();
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
   });
 
-  it('should display an error when symbol is undefined', async () => {
+  it('should execute a successful sync with one order', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(10);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalled();
+    expect(ghostfolioMock.importData).toHaveBeenCalledTimes(1);
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
+
+  it('should not sync an already synced order', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [{ comment: 'order-id' } as Activity] };
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(10);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalled();
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
+
+  it('should sync multiple non alrady synced orders', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id-1',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+        {
+          id: 'order-id-2',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+        {
+          id: 'order-id-3',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [{ comment: 'order-id-2' } as Activity] };
+
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(10);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalled();
+    expect(ghostfolioMock.importData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        activities: expect.arrayContaining([
+          expect.objectContaining({ comment: 'order-id-1' }),
+        ]),
+      })
+    );
+    expect(ghostfolioMock.importData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        activities: expect.arrayContaining([
+          expect.objectContaining({ comment: 'order-id-3' }),
+        ]),
+      })
+    );
+    expect(ghostfolioMock.importData).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        activities: expect.arrayContaining([
+          expect.objectContaining({ comment: 'order-id-2' }),
+        ]),
+      })
+    );
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
+  });
+
+  it('should return an error when enable to get crypto name', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+
     jest
-      .spyOn(CoingeckoModule, 'getCryptoNameBySymbol')
+      .spyOn(cryptoMock, 'getCryptoNameBySymbol')
       .mockResolvedValue(undefined);
-    await sync({ pair: 'BTC/EUR' }, {});
 
-    expect(loggerMock.logErr).toBeCalledTimes(1);
-    expect(loggerMock.logErr).toBeCalledWith(
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith(
       'unable to get name for symbol BTC'
     );
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).not.toHaveBeenCalledWith('sync done');
   });
 
-  it('should display an error when orders is undefined', async () => {
-    nexoProMock.getOrders.mockRejectedValue(undefined);
-    await sync({ pair: 'BTC/EUR' }, {});
+  it('should return an error when unable to get orders', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
 
-    expect(loggerMock.logErr).toBeCalledTimes(1);
-    expect(loggerMock.logErr).toBeCalledWith('unable to fetch orders');
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(undefined);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith('unable to fetch orders');
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).not.toHaveBeenCalledWith('sync done');
   });
 
-  it('should work when no orders', async () => {
-    nexoProMock.getOrders.mockResolvedValue({ orders: [] });
-    await sync({ pair: 'BTC/EUR' }, {});
+  it('should not sync when order is invalid/cancelled', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 0,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
 
-    expect(loggerMock.logOk).toBeCalledTimes(1);
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-  });
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
 
-  it('should return two errors when price is not available', async () => {
-    jest
-      .spyOn(JsdelivrModule, 'getUsdPriceFromSymbol')
-      .mockResolvedValue(undefined);
-    await sync({ pair: 'BTC/EUR' }, {});
+    // Act
+    await sync({ pair });
 
-    expect(loggerMock.logErr).toBeCalledTimes(2);
-    expect(loggerMock.logOk).toBeCalledTimes(1);
-    expect(gfMock.importData).not.toBeCalled();
-  });
-
-  it('should import other when price is unavalable one time', async () => {
-    jest
-      .spyOn(JsdelivrModule, 'getUsdPriceFromSymbol')
-      .mockResolvedValueOnce(undefined);
-    await sync({ pair: 'BTC/EUR' }, {});
-
-    expect(loggerMock.logErr).toBeCalledTimes(1);
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-    expect(gfMock.importData).toBeCalledTimes(1);
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [ActivitiesImport[1]],
-    });
-  });
-
-  it('should import all orders correctly', async () => {
-    await sync({ pair: 'BTC/EUR' }, {});
-
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-    expect(gfMock.importData).toBeCalledTimes(2);
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [ActivitiesImport[0]],
-    });
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [ActivitiesImport[1]],
-    });
-  });
-
-  it('should import with the right account id', async () => {
-    jest.spyOn(ConfigModule, 'readConfig').mockReturnValue({
-      nexo: { key: '', secret: '' },
-      ghostfolio: {
-        hostname: '',
-        port: '',
-        secret: '',
-        accountId: 'account-id',
-      },
-    });
-
-    await sync({ pair: 'BTC/EUR' }, {});
-
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-    expect(gfMock.importData).toBeCalledTimes(2);
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [{ ...ActivitiesImport[0], accountId: 'account-id' }],
-    });
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [{ ...ActivitiesImport[1], accountId: 'account-id' }],
-    });
-  });
-
-  it('should import only if activity is not already present', async () => {
-    gfMock.order.mockResolvedValue({
-      activities: [{ comment: 'id-2' } as unknown as Activity],
-    });
-
-    await sync({ pair: 'BTC/EUR' }, {});
-
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-    expect(gfMock.importData).toBeCalledTimes(1);
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [ActivitiesImport[0]],
-    });
-    expect(loggerMock.logDebug).toBeCalledWith(
-      `order ${orders[1].id} already synced`
+    // Assert
+    expect(loggerMock.error).not.toHaveBeenCalledWith(
+      'order order-id is invalid'
     );
-
-    gfMock.importData.mockClear();
-
-    gfMock.order.mockResolvedValue({
-      activities: [{ comment: 'id-1' } as unknown as Activity],
-    });
-    jest.spyOn(GhostfolioApiModule, 'default').mockReturnValueOnce(gfMock);
-
-    await sync({ pair: 'BTC/EUR' }, {});
-
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-    expect(gfMock.importData).toBeCalledTimes(1);
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [ActivitiesImport[1]],
-    });
-    expect(loggerMock.logDebug).toBeCalledWith(
-      `order ${orders[0].id} already synced`
-    );
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
   });
 
-  it('should skip import if nexo order is invalid', async () => {
-    nexoProMock.getOrders.mockResolvedValue({
-      orders: [orders[0], { ...orders[1], executedQuantity: 0 }],
-    });
-    await sync({ pair: 'BTC/EUR' }, {});
+  it('should display an error when unable to import through ghostfolio', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
 
-    expect(loggerMock.logOk).toBeCalledWith('sync done');
-    expect(loggerMock.logDebug).toBeCalledWith(
-      `order ${orders[1].id} is invalid`
-    );
-    expect(gfMock.importData).toBeCalledTimes(1);
-    expect(gfMock.importData).toBeCalledWith({
-      activities: [ActivitiesImport[0]],
-    });
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(10);
+    jest.spyOn(ghostfolioMock, 'importData').mockRejectedValue(undefined);
+
+    // Act
+    await sync({ pair });
+
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith('unable to import order-id');
+    expect(ghostfolioMock.importData).toHaveBeenCalledTimes(1);
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
   });
 
-  it('should get usd price with correct date', async () => {
-    await sync({ pair: 'BTC/EUR' }, {});
+  it('should not sync when unable to get usd price', async () => {
+    // Arrange
+    const pair = 'BTC/USD';
+    const name = 'Bitcoin';
+    const orders: GetOrdersResponse = {
+      orders: [
+        {
+          id: 'order-id',
+          executedQuantity: 10,
+          timestamp: 10,
+          exchangeRate: 20,
+          side: 'buy',
+        },
+      ],
+    };
+    const activities = { activities: [] };
 
-    expect(JsdelivrModule.getUsdPriceFromSymbol).toBeCalledWith(
-      'eur',
-      '1970-01-01'
-    );
-  });
+    jest.spyOn(cryptoMock, 'getCryptoNameBySymbol').mockResolvedValue(name);
+    jest.spyOn(exchangeMock, 'getOrders').mockResolvedValue(orders);
+    jest.spyOn(ghostfolioMock, 'order').mockResolvedValue(activities);
+    jest.spyOn(forexMock, 'getUsdPriceFromSymbol').mockResolvedValue(undefined);
 
-  it('should log an error if import throw an error', async () => {
-    jest.spyOn(GhostfolioApiModule, 'default').mockReturnValue({
-      importData: () => {
-        throw Error;
-      },
-      order: gfMock.order,
-    });
-    await sync({ pair: 'BTC/EUR' }, {});
+    // Act
+    await sync({ pair });
 
-    expect(gfMock.importData).toBeCalledTimes(0);
-    expect(loggerMock.logErr).toBeCalledWith(
-      `unable to import ${orders[1].id}`
-    );
-  });
-
-  it('should not print debug log when not activated', async () => {
-    nexoProMock.getOrders.mockResolvedValue({ orders: [] });
-    await sync({ pair: 'BTC/EUR' }, { debug: false });
-    expect(loggerMock.setDebug).toBeCalledTimes(0);
-    await sync({ pair: 'BTC/EUR' }, {});
-    expect(loggerMock.setDebug).toBeCalledTimes(0);
-    await sync({ pair: 'BTC/EUR' }, { debug: true });
-    expect(loggerMock.setDebug).toBeCalledTimes(1);
+    // Assert
+    expect(loggerMock.error).toHaveBeenCalledWith('unable to get price of USD');
+    expect(ghostfolioMock.importData).not.toHaveBeenCalled();
+    expect(loggerMock.info).toHaveBeenCalledWith('sync done');
   });
 });

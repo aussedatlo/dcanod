@@ -1,6 +1,6 @@
 export type BuyParams = {
   pair: string;
-  ammount: number;
+  amount: number;
 };
 
 export type LoadParams = {
@@ -11,10 +11,6 @@ export type SyncParams = {
   pair: string;
 };
 
-export type OrderResult = {
-  pair: string;
-  id: number | string;
-  time: number;
-  price: number;
-  quantity: number;
+export type UnknownParams = {
+  command: string;
 };
