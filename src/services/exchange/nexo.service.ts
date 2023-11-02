@@ -19,6 +19,8 @@ class NexoService implements IExchange {
   public client: NexoProClient;
 
   constructor(@inject(TYPES.ConfigService) configService: IConfig) {
+    if (!configService.config) return;
+
     const { nexo } = configService.config;
     this.client = Client({ api_key: nexo.key, api_secret: nexo.secret });
   }

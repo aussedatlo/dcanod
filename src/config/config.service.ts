@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { inject, injectable } from 'inversify';
 import { dirname } from 'path';
 
@@ -9,13 +9,13 @@ import { Config } from '@app/types/config';
 import { DEFAULT_CONFIG_FILE } from '@app/utils/constant';
 
 export interface IConfig {
-  config: Config;
+  config: Config | undefined;
   saveConfig: (data: Config, file?: string) => void;
 }
 
 @injectable()
 class FileConfigService implements IConfig {
-  public config: Config;
+  public config: Config | undefined;
   private logger: ILogger;
 
   constructor(
@@ -23,13 +23,15 @@ class FileConfigService implements IConfig {
     @inject(TYPES.AppOptions) options: IAppOptions
   ) {
     this.logger = logger;
-    this.readConfig(options.options.configFile);
+    const configFile = options.options.configFile ?? DEFAULT_CONFIG_FILE;
+    if (!existsSync(configFile)) return;
+    this.config = this.readConfig(configFile);
   }
 
   private readConfig(file: string = DEFAULT_CONFIG_FILE) {
     this.logger.debug(`using config file ${file}`);
     const config = readFileSync(file, 'utf-8');
-    this.config = { ...JSON.parse(config), path: file };
+    return { ...JSON.parse(config), path: file };
   }
 
   public saveConfig(data: Config, file: string = DEFAULT_CONFIG_FILE) {

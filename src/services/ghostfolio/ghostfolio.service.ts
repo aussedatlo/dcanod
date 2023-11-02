@@ -13,6 +13,8 @@ class GhostfolioService implements IGhostfolio {
   private config: GhostfolioConfig;
 
   constructor(@inject(TYPES.ConfigService) configService: IConfig) {
+    if (!configService.config) return;
+
     this.config = configService.config.ghostfolio;
     this.client = ghostfolioApi(
       this.config.secret,

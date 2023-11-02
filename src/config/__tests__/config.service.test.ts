@@ -41,6 +41,7 @@ describe('Config: File config service', () => {
     // Arrange
     const options: IAppOptions = { options: {} };
     const fakeConfig = {} as Config;
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
     jest.spyOn(fs, 'readFileSync').mockImplementation(fsMock.readFileSync);
     fsMock.readFileSync.mockReturnValue(JSON.stringify(fakeConfig));
 
@@ -77,6 +78,22 @@ describe('Config: File config service', () => {
       options.options.configFile,
       'utf-8'
     );
+  });
+
+  it('should return undefined if the fine doesnt exist', async () => {
+    // Arrange
+    const options: IAppOptions = { options: {} };
+    jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+
+    // Act
+    container
+      .bind<IConfig>(TYPES.ConfigService)
+      .toConstantValue(new FileConfigService(loggerMock, options));
+    const { config } = container.get<IConfig>(TYPES.ConfigService);
+
+    // Assert
+    expect(config).toBe(undefined);
+    expect(fsMock.readFileSync).not.toBeCalled();
   });
 
   it('should save into default config file', async () => {
