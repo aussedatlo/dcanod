@@ -3,6 +3,7 @@ import Client from 'nexo-pro';
 import { NexoProClient } from 'nexo-pro/lib/types/client';
 
 import { IConfig } from '@app/config/config.service';
+import { ILogger } from '@app/logger/interface';
 import {
   GetOrdersParams,
   GetOrdersResponse,
@@ -17,9 +18,17 @@ import { TYPES } from '@app/types';
 @injectable()
 class NexoService implements IExchange {
   public client: NexoProClient;
+  private logger: ILogger;
 
-  constructor(@inject(TYPES.ConfigService) configService: IConfig) {
-    if (!configService.config) return;
+  constructor(
+    @inject(TYPES.ConfigService) configService: IConfig,
+    @inject(TYPES.LoggerService) logger: ILogger
+  ) {
+    this.logger = logger;
+    if (!configService.config) {
+      this.logger.error('unable to get config');
+      return;
+    }
 
     const { nexo } = configService.config;
     this.client = Client({ api_key: nexo.key, api_secret: nexo.secret });
