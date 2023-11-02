@@ -26,8 +26,7 @@ providing a smooth and efficient experience for managing their crypto investment
 ## Install
 
 ```shell
-pnpm install
-pnpm build
+pnpm i -g dcanod
 ```
 
 ## Setup command
@@ -80,8 +79,15 @@ To run DCANod every Monday at 8 AM, add the following line to the crontab:
 0 8 * * 1 dcanod-cli BTC/USDT 20
 ```
 
+## Build locally
+
+```shell
+pnpm build
+```
+
 ## Tests
 
 ```shell
 pnpm test
+pnpm prettier
 ```
